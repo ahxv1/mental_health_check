@@ -1,0 +1,20 @@
+﻿# API keys and generated config - never commit these
+.env
+.env.*
+!.env.example
+config.js
+
+# Build output
+/dist/
+
+# Old local artifacts that may contain secrets
+/old/
+/files.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*

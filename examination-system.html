@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindCheck — Mental Wellness Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --sage: #7C9A7E;
+  --sage-light: #B8D0BA;
+  --sage-dark: #4A6B4D;
+  --cream: #FAF7F2;
+  --warm-white: #FFFDF9;
+  --charcoal: #2C2C2C;
+  --mid: #6B6B6B;
+  --light-border: #E8E2D9;
+  --card-bg: #FFFFFF;
+  --page-bg: #FAF7F2;
+  --text: #2C2C2C;
+  --text-soft: #6B6B6B;
+  --accent: #C4916A;
+  --accent-light: #F0DDD0;
+  --blue: #6B8CAE;
+  --blue-light: #D6E4F0;
+  --rose: #B07070;
+  --rose-light: #F0D8D8;
+  --shadow: 0 2px 24px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+[data-theme="dark"] {
+  --cream: #1A1A1A;
+  --warm-white: #222222;
+  --charcoal: #F0EDE8;
+  --mid: #A0A0A0;
+  --light-border: #333333;
+  --card-bg: #2A2A2A;
+  --page-bg: #1A1A1A;
+  --text: #F0EDE8;
+  --text-soft: #A0A0A0;
+  --accent-light: #3A2A20;
+  --blue-light: #1A2A38;
+  --rose-light: #2A1A1A;
+  --shadow: 0 2px 24px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.4);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--page-bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  line-height: 1.6;
+}
+h1, h2, h3 { font-family: 'DM Serif Display', serif; font-weight: 400; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: var(--warm-white);
+  border-bottom: 1px solid var(--light-border);
+  backdrop-filter: blur(10px);
+  transition: background 0.3s;
+}
+.nav-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--sage-dark); letter-spacing: -0.3px; }
+.nav-logo span { color: var(--accent); font-style: italic; }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-btn {
+  background: none; border: 1px solid var(--light-border);
+  border-radius: 8px; padding: 6px 14px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--text-soft); cursor: pointer; transition: all 0.2s;
+}
+.nav-btn:hover { border-color: var(--sage); color: var(--sage-dark); }
+.theme-toggle {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: 20px; padding: 6px 12px; cursor: pointer;
+  font-size: 16px; transition: all 0.2s;
+}
+.theme-toggle:hover { border-color: var(--sage); }
+
+
+/* MOBILE NAV */
+.nav-mobile-right { display: none; align-items: center; gap: 8px; }
+.hamburger {
+  background: none; border: 1px solid var(--light-border);
+  border-radius: 8px; padding: 7px 9px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px; transition: border-color 0.2s;
+}
+.hamburger:hover { border-color: var(--sage); }
+.hamburger span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.25s; }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none; flex-direction: column; gap: 4px;
+  position: fixed; top: 57px; left: 0; right: 0; z-index: 99;
+  background: var(--warm-white); border-bottom: 1px solid var(--light-border);
+  padding: 12px 16px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  transform: translateY(-10px); opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.mobile-menu.open { display: flex; transform: translateY(0); opacity: 1; }
+.mob-btn {
+  background: none; border: 1px solid var(--light-border);
+  border-radius: 10px; padding: 12px 16px; text-align: left;
+  font-family: 'DM Sans', sans-serif; font-size: 15px;
+  color: var(--text); cursor: pointer; transition: all 0.18s;
+}
+.mob-btn:hover { border-color: var(--sage); color: var(--sage-dark); background: var(--page-bg); }
+.mobile-overlay {
+  display: none; position: fixed; inset: 0; z-index: 98;
+  background: rgba(0,0,0,0.15);
+}
+.mobile-overlay.open { display: block; }
+
+/* LANG BUTTON */
+.lang-btn {
+  font-weight: 700 !important; font-size: 12px !important;
+  letter-spacing: 0.05em; min-width: 38px;
+  background: var(--sage-dark) !important; color: white !important;
+  border-color: var(--sage-dark) !important;
+}
+.lang-btn:hover { background: var(--sage) !important; border-color: var(--sage) !important; }
+
+/* RTL SUPPORT */
+[dir="rtl"] { font-family: 'DM Sans', 'Segoe UI', Tahoma, sans-serif; }
+[dir="rtl"] .hero { direction: rtl; }
+[dir="rtl"] .hero-sub { margin-left: auto; margin-right: 0; }
+[dir="rtl"] .progress-meta, [dir="rtl"] .q-nav,
+[dir="rtl"] .ai-analysis-header, [dir="rtl"] .sm-card-header { flex-direction: row-reverse; }
+[dir="rtl"] .option-btn { flex-direction: row-reverse; text-align: right; }
+[dir="rtl"] .option-btn:hover { transform: translateX(-3px); }
+[dir="rtl"] .qb-item { direction: rtl; }
+[dir="rtl"] .qb-right { align-items: flex-start; }
+[dir="rtl"] .when-to-seek li::before { content: "←"; }
+[dir="rtl"] .crisis-link { flex-direction: row-reverse; }
+[dir="rtl"] .sm-score-range-labels { flex-direction: row-reverse; }
+[dir="rtl"] .cat-score-meta { flex-direction: row-reverse; }
+
+@media (max-width: 768px) {
+  .nav-right { display: none !important; }
+  .nav-mobile-right { display: flex !important; }
+  .page { padding-top: 58px; }
+}
+
+/* PAGES */
+.page { display: none; min-height: 100vh; padding-top: 72px; }
+.page.active { display: block; }
+
+/* LANDING */
+#page-landing {
+  display: none;
+  background: var(--page-bg);
+  position: relative; overflow: hidden;
+}
+#page-landing.active { display: block; }
+.hero {
+  max-width: 1100px; margin: 0 auto;
+  padding: 80px 32px 60px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; padding: 40px 20px 40px; gap: 40px; }
+  nav { padding: 14px 20px; }
+}
+.hero-tag {
+  display: inline-block; background: var(--accent-light);
+  color: var(--accent); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 20px; margin-bottom: 20px;
+}
+.hero h1 { font-size: clamp(36px, 5vw, 58px); line-height: 1.1; color: var(--text); margin-bottom: 20px; }
+.hero h1 em { color: var(--sage-dark); font-style: italic; }
+.hero-sub { font-size: 17px; color: var(--text-soft); line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.btn-primary {
+  background: var(--sage-dark); color: white;
+  border: none; border-radius: 12px;
+  padding: 14px 32px; font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s; letter-spacing: 0.01em;
+}
+.btn-primary:hover { background: var(--sage); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(74,107,77,0.3); }
+.btn-secondary {
+  background: none; border: 1px solid var(--light-border);
+  border-radius: 12px; padding: 13px 24px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px;
+  color: var(--text-soft); cursor: pointer; transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--sage); color: var(--sage-dark); }
+.privacy-note {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 20px; font-size: 13px; color: var(--text-soft);
+}
+.privacy-note svg { flex-shrink: 0; }
+.hero-visual {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.hero-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 22px 24px;
+  box-shadow: var(--shadow); transition: transform 0.3s;
+}
+.hero-card:hover { transform: translateY(-2px); }
+.hero-card-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 8px; }
+.hero-card-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 4px; }
+.hero-card-sub { font-size: 13px; color: var(--text-soft); }
+.bar-preview { display: flex; gap: 4px; margin-top: 12px; align-items: flex-end; }
+.bar-preview div { border-radius: 4px; flex: 1; }
+
+.features { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+@media (max-width: 768px) { .features-grid { grid-template-columns: 1fr; } .features { padding: 20px 20px 60px; } }
+.feature-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 28px 24px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.feature-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 20px; }
+.feature-card h3 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 8px; }
+.feature-card p { font-size: 14px; color: var(--text-soft); line-height: 1.6; }
+.disclaimer-banner {
+  max-width: 1100px; margin: 0 auto 60px;
+  padding: 0 32px;
+}
+@media (max-width: 768px) { .disclaimer-banner { padding: 0 20px; } }
+.disclaimer-inner {
+  background: var(--accent-light); border: 1px solid var(--accent);
+  border-radius: var(--radius); padding: 20px 24px;
+  font-size: 13px; color: var(--charcoal); line-height: 1.6;
+}
+.disclaimer-inner strong { color: var(--accent); }
+
+/* ASSESSMENT */
+#page-assess { display: none; }
+#page-assess.active { display: block; }
+.assess-wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+.progress-header { margin-bottom: 32px; }
+.progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.progress-meta span { font-size: 13px; color: var(--text-soft); }
+.progress-section { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sage-dark); }
+.progress-bar-track { height: 6px; background: var(--light-border); border-radius: 3px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--sage), var(--sage-dark)); border-radius: 3px; transition: width 0.4s ease; }
+
+.question-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 36px 32px;
+  box-shadow: var(--shadow); animation: fadeSlide 0.3s ease;
+}
+@media (max-width: 600px) { .question-card { padding: 24px 20px; } }
+@keyframes fadeSlide { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.q-number { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; }
+.q-text { font-family: 'DM Serif Display', serif; font-size: clamp(18px, 3vw, 24px); line-height: 1.4; color: var(--text); margin-bottom: 32px; }
+.options-grid { display: flex; flex-direction: column; gap: 10px; }
+.option-btn {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--page-bg); border: 1px solid var(--light-border);
+  border-radius: 12px; padding: 14px 18px; cursor: pointer;
+  transition: all 0.18s; text-align: left;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+  width: 100%;
+}
+.option-btn:hover { border-color: var(--sage-light); background: var(--card-bg); transform: translateX(3px); }
+.option-btn.selected { border-color: var(--sage-dark); background: #EBF1EB; color: var(--sage-dark); }
+[data-theme="dark"] .option-btn.selected { background: #1E2E1E; }
+.option-score {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--light-border); font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.18s;
+}
+.option-btn.selected .option-score { background: var(--sage-dark); color: white; }
+.option-label { font-size: 14px; }
+
+.q-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+.btn-nav {
+  background: none; border: 1px solid var(--light-border);
+  border-radius: 10px; padding: 10px 22px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: var(--text-soft); cursor: pointer; transition: all 0.2s;
+}
+.btn-nav:hover:not(:disabled) { border-color: var(--sage); color: var(--sage-dark); }
+.btn-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-nav-primary {
+  background: var(--sage-dark); color: white; border: none;
+  border-radius: 10px; padding: 11px 28px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-nav-primary:hover { background: var(--sage); }
+.btn-nav-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.crisis-alert {
+  display: none; margin-top: 24px;
+  background: #FFF3F3; border: 1px solid #E8A0A0;
+  border-radius: var(--radius); padding: 20px 22px;
+  font-size: 14px; line-height: 1.6; color: #5C3030;
+}
+[data-theme="dark"] .crisis-alert { background: #2A1515; border-color: #804040; color: #F0C0C0; }
+.crisis-alert strong { display: block; margin-bottom: 6px; font-size: 15px; }
+.crisis-alert a { color: var(--rose); }
+
+/* RESULTS */
+#page-results { display: none; }
+#page-results.active { display: block; }
+.results-wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+.results-header { text-align: center; margin-bottom: 48px; }
+.results-header h1 { font-size: clamp(32px, 5vw, 50px); margin-bottom: 12px; }
+.results-header p { font-size: 16px; color: var(--text-soft); max-width: 520px; margin: 0 auto; }
+.score-hero {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;
+}
+@media (max-width: 650px) { .score-hero { grid-template-columns: 1fr; } }
+.overall-card {
+  background: var(--sage-dark); color: white;
+  border-radius: var(--radius); padding: 36px 28px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  grid-row: span 2;
+}
+@media (max-width: 650px) { .overall-card { grid-row: span 1; } }
+.overall-label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; margin-bottom: 16px; }
+.overall-score { font-family: 'DM Serif Display', serif; font-size: 80px; line-height: 1; margin-bottom: 8px; }
+.overall-max { font-size: 14px; opacity: 0.7; margin-bottom: 20px; }
+.overall-level { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 18px; font-size: 14px; font-weight: 500; }
+.cat-score-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow);
+}
+.cat-score-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 6px; }
+.cat-score-name { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 12px; }
+.cat-score-bar-track { height: 8px; background: var(--light-border); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.cat-score-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.cat-score-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-soft); }
+.cat-score-level { font-weight: 600; }
+
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+@media (max-width: 650px) { .charts-row { grid-template-columns: 1fr; } }
+.chart-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+}
+.chart-card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 16px; }
+.chart-container { position: relative; height: 220px; }
+
+.section-title { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 20px; }
+.recs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 40px; }
+.rec-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 22px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.rec-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.rec-card-icon { font-size: 24px; margin-bottom: 12px; }
+.rec-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.rec-card p { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+
+.results-disclaimer {
+  background: var(--accent-light); border: 1px solid var(--accent);
+  border-radius: var(--radius); padding: 20px 24px;
+  font-size: 13px; color: var(--charcoal); line-height: 1.7; margin-bottom: 32px;
+}
+.results-disclaimer strong { color: var(--accent); }
+
+.crisis-box {
+  display: none;
+  background: #FFF3F3; border: 2px solid #CC6666;
+  border-radius: var(--radius); padding: 28px;
+  margin-bottom: 32px;
+}
+[data-theme="dark"] .crisis-box { background: #2A1515; border-color: #804040; }
+.crisis-box h3 { font-family: 'DM Serif Display', serif; font-size: 22px; color: #933; margin-bottom: 12px; }
+[data-theme="dark"] .crisis-box h3 { color: #F08080; }
+.crisis-box p { font-size: 14px; color: #5C3030; margin-bottom: 12px; line-height: 1.7; }
+[data-theme="dark"] .crisis-box p { color: #F0C0C0; }
+.crisis-links { display: flex; flex-direction: column; gap: 6px; }
+.crisis-link {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--rose); font-weight: 500; text-decoration: none;
+  padding: 8px 14px; border-radius: 8px; border: 1px solid var(--rose-light);
+  background: var(--rose-light); transition: opacity 0.2s;
+}
+.crisis-link:hover { opacity: 0.8; }
+
+/* RESOURCES */
+#page-resources { display: none; }
+#page-resources.active { display: block; }
+.resources-wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+.resources-wrap h1 { font-size: clamp(30px, 4vw, 46px); margin-bottom: 12px; }
+.resources-sub { font-size: 16px; color: var(--text-soft); margin-bottom: 48px; }
+.resources-section { margin-bottom: 48px; }
+.resources-section h2 { font-family: 'DM Serif Display', serif; font-size: 26px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--light-border); }
+.resource-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.resource-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 22px 20px;
+}
+.resource-card-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
+.resource-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.resource-card p { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+
+.when-to-seek {
+  background: var(--blue-light); border: 1px solid var(--blue);
+  border-radius: var(--radius); padding: 28px;
+}
+.when-to-seek h3 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--blue); margin-bottom: 14px; }
+.when-to-seek ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.when-to-seek li { font-size: 14px; color: var(--text); display: flex; align-items: flex-start; gap: 10px; }
+.when-to-seek li::before { content: "→"; color: var(--blue); font-weight: 600; flex-shrink: 0; }
+
+
+/* AI ANALYSIS */
+.ai-analysis-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 28px 28px 24px;
+  box-shadow: var(--shadow); margin-bottom: 32px;
+  border-left: 4px solid var(--sage-dark);
+}
+.ai-analysis-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; flex-wrap: wrap; gap: 8px;
+}
+.ai-badge {
+  background: var(--sage-dark); color: white;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
+  text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
+}
+.ai-loading {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 14px; color: var(--text-soft); padding: 16px 0;
+}
+.ai-spinner {
+  width: 18px; height: 18px; border: 2px solid var(--light-border);
+  border-top-color: var(--sage-dark); border-radius: 50%;
+  animation: spin 0.8s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.ai-analysis-content { line-height: 1.8; font-size: 15px; color: var(--text); }
+.ai-section { margin-bottom: 20px; }
+.ai-section-title {
+  font-family: 'DM Serif Display', serif; font-size: 18px;
+  color: var(--sage-dark); margin-bottom: 8px;
+}
+.ai-section p { font-size: 14px; color: var(--text); line-height: 1.75; margin-bottom: 8px; }
+.ai-section ul { padding-left: 20px; margin: 0; }
+.ai-section li { font-size: 14px; color: var(--text); line-height: 1.7; margin-bottom: 4px; }
+
+/* PATTERN GRID */
+.pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 40px; }
+.pattern-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); padding: 20px 18px;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.pattern-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.pattern-card-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 2px 2px 0 0; }
+.pattern-level-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
+}
+.pattern-name { font-family: 'DM Serif Display', serif; font-size: 17px; margin-bottom: 6px; }
+.pattern-desc { font-size: 12px; color: var(--text-soft); line-height: 1.55; }
+.pattern-signal { font-size: 11px; font-weight: 600; margin-top: 8px; }
+
+/* SCORE MEANING */
+.score-meaning-cards { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+.sm-card {
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.sm-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; gap: 16px;
+  cursor: pointer; transition: background 0.15s;
+}
+.sm-card-header:hover { background: var(--page-bg); }
+.sm-card-left { display: flex; align-items: center; gap: 14px; }
+.sm-card-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.sm-card-title { font-family: 'DM Serif Display', serif; font-size: 18px; }
+.sm-card-score-pill {
+  font-size: 13px; font-weight: 600; padding: 4px 14px;
+  border-radius: 20px; white-space: nowrap;
+}
+.sm-card-body { padding: 0 22px 20px; display: none; }
+.sm-card-body.open { display: block; }
+.sm-score-track { height: 10px; background: var(--light-border); border-radius: 5px; overflow: hidden; margin: 14px 0 10px; }
+.sm-score-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
+.sm-score-range-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-soft); margin-bottom: 16px; }
+.sm-meaning-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
+@media(max-width:600px){ .sm-meaning-grid { grid-template-columns: repeat(2,1fr); } }
+.sm-range-box { border-radius: 8px; padding: 10px 8px; text-align: center; border: 1px solid transparent; }
+.sm-range-box.active { border-color: currentColor; }
+.sm-range-label { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+.sm-range-scores { font-family: 'DM Serif Display', serif; font-size: 18px; }
+.sm-range-desc { font-size: 11px; margin-top: 4px; line-height: 1.4; }
+.sm-your-score { font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+.sm-toggle-icon { font-size: 18px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; }
+.sm-card-header.open .sm-toggle-icon { transform: rotate(180deg); }
+
+/* QUESTION BREAKDOWN */
+.qb-wrap { margin-bottom: 40px; }
+.qb-section { margin-bottom: 24px; }
+.qb-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-soft); padding: 8px 0; border-bottom: 1px solid var(--light-border);
+  margin-bottom: 10px;
+}
+.qb-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+  padding: 12px 14px; border-radius: 10px; margin-bottom: 6px;
+  background: var(--card-bg); border: 1px solid var(--light-border);
+  transition: background 0.15s;
+}
+.qb-item:hover { background: var(--page-bg); }
+.qb-q { font-size: 13px; color: var(--text); line-height: 1.5; }
+.qb-q-num { font-size: 11px; color: var(--text-soft); margin-bottom: 3px; }
+.qb-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.qb-answer { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.qb-score { font-size: 11px; color: var(--text-soft); }
+.qb-flag { font-size: 11px; color: var(--rose); font-weight: 600; margin-top: 2px; }
+
+
+/* AI badge update for Gemini */
+.ai-badge-gemini { background: #1A73E8; }
+
+/* Utility */
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-32 { margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Mind<span>Check</span></div>
+  <div class="nav-right" id="navRight">
+    <button class="nav-btn" id="nb-home" onclick="showPage('landing');closeMenu()">Home</button>
+    <button class="nav-btn" id="nb-assess" onclick="showPage('assess');startAssessment();closeMenu()">Assessment</button>
+    <button class="nav-btn" id="nb-resources" onclick="showPage('resources');closeMenu()">Resources</button>
+    <button class="nav-btn lang-btn" onclick="toggleLang()" id="langBtn" title="Switch language">AR</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle dark mode">🌙</button>
+  </div>
+  <div class="nav-mobile-right">
+    <button class="nav-btn lang-btn" onclick="toggleLang()" id="langBtnMobile" title="Switch language">AR</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtnMobile">🌙</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mob-btn" id="mb-home" onclick="showPage('landing');closeMenu()">Home</button>
+  <button class="mob-btn" id="mb-assess" onclick="showPage('assess');startAssessment();closeMenu()">Assessment</button>
+  <button class="mob-btn" id="mb-resources" onclick="showPage('resources');closeMenu()">Resources</button>
+</div>
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMenu()"></div>
+
+<!-- LANDING PAGE -->
+<div id="page-landing" class="page">
+  <div class="hero">
+    <div class="hero-content">
+      <span class="hero-tag" id="land-tag">Free · Private · Non-diagnostic</span>
+      <h1><span id="land-h1a">Understand your</span> <em id="land-h1b">mental wellness</em> <span id="land-h1c">better</span></h1>
+      <p class="hero-sub" id="land-sub">A thoughtful, science-inspired self-assessment covering mood, self-esteem, and emotional well-being. Takes 10–15 minutes. Completely private.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" id="land-start" onclick="showPage('assess'); startAssessment()">Start Assessment</button>
+        <button class="btn-secondary" id="land-learn" onclick="showPage('resources')">Learn more</button>
+      </div>
+      <div class="privacy-note">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L2 3v4c0 3 2.5 5.5 5 6 2.5-.5 5-3 5-6V3L7 1z" stroke="var(--sage)" stroke-width="1.2" fill="none"/></svg>
+        <span id="land-privacy">Your responses are never sent anywhere — all data stays in your browser only.</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-label">Depression screening</div>
+        <div class="hero-card-title">Mood & energy patterns</div>
+        <div class="hero-card-sub">Based on established PHQ-inspired concepts</div>
+        <div class="bar-preview">
+          <div style="height:30px;background:var(--sage-light)"></div>
+          <div style="height:45px;background:var(--sage)"></div>
+          <div style="height:38px;background:var(--sage-light)"></div>
+          <div style="height:55px;background:var(--sage-dark)"></div>
+          <div style="height:28px;background:var(--sage-light)"></div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-label">Self-esteem</div>
+        <div class="hero-card-title">Self-image & confidence</div>
+        <div class="hero-card-sub">Rosenberg-inspired framework</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-label">Emotional well-being</div>
+        <div class="hero-card-title">Stress & resilience</div>
+        <div class="hero-card-sub">Coping patterns and emotional balance</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--accent-light)">🧭</div>
+        <h3 id="land-f1t">30 thoughtful questions</h3>
+        <p id="land-f1p">Carefully crafted questions covering three dimensions of mental wellness, inspired by established screening frameworks.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--blue-light)">📊</div>
+        <h3 id="land-f2t">Visual results dashboard</h3>
+        <p id="land-f2p">See your scores visualized with charts, category breakdowns, and plain-language explanations of what they mean.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--sage-light)">💚</div>
+        <h3 id="land-f3t">Personalized guidance</h3>
+        <p id="land-f3p">Receive tailored, evidence-based self-care recommendations specific to your results — supportive, not prescriptive.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer-banner">
+    <div class="disclaimer-inner">
+      <strong id="land-disc-strong">Important:</strong> <span id="land-disc-text">This assessment is not a medical diagnosis. Results are educational and informational only. If you are experiencing significant emotional distress or concerns about your mental health, please seek support from a qualified mental health professional.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ASSESSMENT PAGE -->
+<div id="page-assess" class="page">
+  <div class="assess-wrap">
+    <div class="progress-header">
+      <div class="progress-meta">
+        <span class="progress-section" id="progressSection">Section 1 of 3 — Mood & Energy</span>
+        <span id="progressText">0 / 30</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="questionCard" class="question-card">
+      <div class="q-number" id="qNumber"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+    <div class="crisis-alert" id="crisisAlert">
+      <strong id="assess-crisis-strong">We noticed something important.</strong>
+      <span id="assess-crisis-text">Your response suggests you may be experiencing significant distress. Please consider reaching out to a trusted person or mental health professional. You are not alone.</span>
+      <br><br>
+      <strong id="assess-crisis-support">Crisis support:</strong><br>
+      International: <a href="https://www.befrienders.org" target="_blank">befrienders.org</a> — global crisis line directory<br>
+      US: 988 Suicide & Crisis Lifeline — call or text <strong>988</strong><br>
+      UK: Samaritans — call <strong>116 123</strong><br>
+      Turkey / TR: <strong>182</strong> (Psychological Support Line)
+    </div>
+    <div class="q-nav">
+      <button class="btn-nav" id="btnPrev" onclick="prevQuestion()" disabled>← Back</button>
+      <button class="btn-nav-primary" id="btnNext" onclick="nextQuestion()" disabled>Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS PAGE -->
+<div id="page-results" class="page">
+  <div class="results-wrap">
+    <div class="results-header">
+      <h1><span id="res-h1a">Your Wellness</span> <em id="res-h1b">Report</em></h1>
+      <p id="res-sub">A detailed breakdown of every score, what it means, and an AI-written personal analysis of your answers.</p>
+    </div>
+
+    <div class="crisis-box" id="resultsCrisisBox">
+      <h3 id="res-crisis-h">Please reach out for support</h3>
+      <p id="res-crisis-p">Your responses suggest you may be experiencing significant emotional distress. This assessment cannot diagnose anything, but your feelings are real and valid — and support is available.</p>
+      <div class="crisis-links">
+        <a href="https://www.befrienders.org" target="_blank" class="crisis-link">🌍 befrienders.org — International crisis lines</a>
+        <a href="tel:988" class="crisis-link">📞 988 — US Suicide & Crisis Lifeline</a>
+        <a href="tel:116123" class="crisis-link">📞 116 123 — Samaritans (UK)</a>
+        <a href="tel:182" class="crisis-link">📞 182 — Turkey Psychological Support Line</a>
+      </div>
+    </div>
+
+    <!-- SCORE OVERVIEW -->
+    <div class="score-hero" id="scoreHero"></div>
+
+    <!-- AI ANALYSIS BLOCK -->
+    <div class="ai-analysis-card" id="aiAnalysisCard">
+      <div class="ai-analysis-header">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="ai-badge" id="res-ai-badge">AI Analysis</div>
+          <span id="geminiStatusDot" style="width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block" title="API status"></span>
+          <span id="geminiStatusText" style="font-size:12px;color:var(--text-soft)">Not tested yet</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span id="res-ai-powered" style="font-size:13px;color:var(--text-soft)">Powered by Google Gemini (free) &middot; Not a clinical diagnosis</span>
+          <button onclick="testGeminiKey()" style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--light-border);background:transparent;color:var(--text-soft);cursor:pointer;font-family:inherit" id="testApiBtn">Test API</button>
+        </div>
+      </div>
+      <div id="aiAnalysisLoading" class="ai-loading">
+        <div class="ai-spinner"></div>
+        <span id="res-ai-loadtext">Analyzing your responses...</span>
+      </div>
+      <div id="aiAnalysisContent" style="display:none"></div>
+    </div>
+
+    <!-- PATTERN INDICATORS -->
+    <div class="section-title mt-32" id="res-patterns-h">What your answers suggest</div>
+    <p id="res-patterns-sub" style="font-size:14px;color:var(--text-soft);margin-bottom:20px">These are patterns detected in your responses — not diagnoses. Think of them as areas worth paying attention to.</p>
+    <div id="patternGrid" class="pattern-grid"></div>
+
+    <!-- SCORE MEANING EXPLAINER -->
+    <div class="section-title mt-32" id="res-score-h">Your score, explained</div>
+    <p id="res-score-sub" style="font-size:14px;color:var(--text-soft);margin-bottom:20px">Each section is scored 0–40. Here's exactly what your numbers mean in plain language.</p>
+    <div id="scoreMeaning" class="score-meaning-cards"></div>
+
+    <!-- PER-QUESTION BREAKDOWN -->
+    <div class="section-title mt-32" id="res-qb-h">Question-by-question breakdown</div>
+    <p id="res-qb-sub" style="font-size:14px;color:var(--text-soft);margin-bottom:20px">See how you answered each question and what each response reflects.</p>
+    <div id="questionBreakdown" class="qb-wrap"></div>
+
+    <!-- CHARTS -->
+    <div class="charts-row mt-32">
+      <div class="chart-card">
+        <h3 id="res-chart-radar">Wellness radar</h3>
+        <div class="chart-container"><canvas id="radarChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3 id="res-chart-bar">Concern levels</h3>
+        <div class="chart-container"><canvas id="barChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="results-disclaimer">
+      <strong id="res-disc-strong">Reminder:</strong> <span id="res-disc-text">This assessment is not a medical diagnosis. Results are educational and informational only. If you are experiencing significant emotional distress, please consult a qualified mental health professional.</span>
+    </div>
+
+    <div class="section-title" id="res-recs-h">Personalized recommendations</div>
+    <div class="recs-grid" id="recsGrid"></div>
+
+    <div class="mt-32">
+      <button class="btn-primary" id="res-retake" onclick="showPage('assess'); startAssessment()">Retake assessment</button>
+      &nbsp;&nbsp;
+      <button class="btn-secondary" id="res-explore" onclick="showPage('resources')">Explore resources</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- RESOURCES PAGE -->
+<div id="page-resources" class="page">
+  <div class="resources-wrap">
+    <h1 id="res-page-h">Resources & Support</h1>
+    <p class="resources-sub" id="res-page-sub">Education, self-help tools, and professional guidance to support your mental well-being journey.</p>
+
+    <div class="resources-section">
+      <h2>Understanding mental wellness</h2>
+      <div class="resource-cards">
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--accent-light);color:var(--accent)">Mood</span>
+          <h4>What is depression?</h4>
+          <p>Depression is more than sadness. It's a persistent low mood affecting energy, thinking, and daily functioning. It's common and treatable.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--blue-light);color:var(--blue)">Self-esteem</span>
+          <h4>Building self-worth</h4>
+          <p>Self-esteem is how you evaluate yourself. Low self-esteem can be improved through consistent practice and sometimes professional support.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--sage-light);color:var(--sage-dark)">Wellness</span>
+          <h4>Emotional resilience</h4>
+          <p>Resilience is the ability to adapt in the face of adversity. It can be built — it's not a fixed trait you either have or don't.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--rose-light);color:var(--rose)">Stress</span>
+          <h4>Understanding anxiety</h4>
+          <p>Anxiety is a normal response to stress, but when persistent, it can interfere with life. Effective evidence-based treatments exist.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="resources-section">
+      <h2>Self-help practices</h2>
+      <div class="resource-cards">
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--sage-light);color:var(--sage-dark)">Mindfulness</span>
+          <h4>5-4-3-2-1 grounding</h4>
+          <p>Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. Helps interrupt anxious thoughts in the moment.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--blue-light);color:var(--blue)">Breathing</span>
+          <h4>Box breathing</h4>
+          <p>Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 times. Activates the parasympathetic nervous system to reduce stress quickly.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--accent-light);color:var(--accent)">Journaling</span>
+          <h4>Expressive writing</h4>
+          <p>Writing about thoughts and feelings for 15–20 minutes has strong evidence for improving mood and processing difficult emotions.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--rose-light);color:var(--rose)">Movement</span>
+          <h4>Exercise & mood</h4>
+          <p>Even 20–30 minutes of moderate aerobic exercise 3x per week has significant evidence for improving mood and reducing anxiety.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="resources-section">
+      <h2>When to seek professional help</h2>
+      <div class="when-to-seek">
+        <h3>Consider reaching out to a professional if you experience:</h3>
+        <ul>
+          <li>Persistent low mood lasting more than two weeks</li>
+          <li>Thoughts of harming yourself or others</li>
+          <li>Significant changes in sleep, appetite, or weight</li>
+          <li>Difficulty functioning at work, school, or in relationships</li>
+          <li>Feeling hopeless or that life is not worth living</li>
+          <li>Using substances to cope with emotional pain</li>
+          <li>Anxiety that feels uncontrollable or overwhelming</li>
+          <li>Feeling disconnected from yourself or reality</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="resources-section">
+      <h2>Crisis support lines</h2>
+      <div class="resource-cards">
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--rose-light);color:var(--rose)">International</span>
+          <h4>Befrienders Worldwide</h4>
+          <p>befrienders.org — find crisis lines in your country. Available in dozens of countries worldwide.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--blue-light);color:var(--blue)">USA</span>
+          <h4>988 Suicide & Crisis Lifeline</h4>
+          <p>Call or text 988. Available 24/7. Free, confidential crisis counseling for people in distress.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--sage-light);color:var(--sage-dark)">UK</span>
+          <h4>Samaritans</h4>
+          <p>Call 116 123, free 24/7. For anyone struggling to cope or at risk of suicide. Also available via email.</p>
+        </div>
+        <div class="resource-card">
+          <span class="resource-card-tag" style="background:var(--accent-light);color:var(--accent)">Turkey</span>
+          <h4>ALO 182</h4>
+          <p>Turkey's Psychological Support Line — free, 24/7, confidential support in Turkish.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+// ── QUESTIONS DATABASE ──────────────────────────────────────────────────────
+const SECTIONS = ['Mood & Energy', 'Self-Esteem & Self-Image', 'Emotional Well-Being'];
+const SECTION_KEYS = ['depression', 'selfesteem', 'wellbeing'];
+const SECTION_COLORS = ['#7C9A7E', '#6B8CAE', '#C4916A'];
+
+const QUESTIONS = [
+  // Section 1: Depression / Mood (Q1–10)
+  { id: 1, section: 0, text: "How often have you felt little interest or pleasure in doing things you usually enjoy?", reverse: false },
+  { id: 2, section: 0, text: "How often have you felt down, depressed, or hopeless?", reverse: false },
+  { id: 3, section: 0, text: "How often have you had trouble falling or staying asleep, or sleeping too much?", reverse: false },
+  { id: 4, section: 0, text: "How often have you felt tired or had little energy?", reverse: false },
+  { id: 5, section: 0, text: "How often have you had poor appetite or been overeating?", reverse: false },
+  { id: 6, section: 0, text: "How often have you felt bad about yourself — or that you are a failure?", reverse: false },
+  { id: 7, section: 0, text: "How often have you had trouble concentrating on things like reading or watching TV?", reverse: false },
+  { id: 8, section: 0, text: "How often have you felt that things are moving slowly for you — in your thoughts or movements?", reverse: false },
+  { id: 9, section: 0, text: "How often have you woken up in the morning feeling positive about the day ahead?", reverse: true },
+  { id: 10, section: 0, text: "How often have you found it easy to laugh or find humour in everyday situations?", reverse: true },
+  // Section 2: Self-Esteem (Q11–20)
+  { id: 11, section: 1, text: "How often do you feel that you are a person of worth, at least on an equal level with others?", reverse: true },
+  { id: 12, section: 1, text: "How often do you feel that you have a number of good qualities?", reverse: true },
+  { id: 13, section: 1, text: "How often do you feel like a failure overall?", reverse: false },
+  { id: 14, section: 1, text: "How often are you able to do things as well as most other people?", reverse: true },
+  { id: 15, section: 1, text: "How often do you feel you do not have much to be proud of?", reverse: false },
+  { id: 16, section: 1, text: "How often do you take a positive attitude toward yourself?", reverse: true },
+  { id: 17, section: 1, text: "How often are you satisfied with yourself?", reverse: true },
+  { id: 18, section: 1, text: "How often do you wish you could have more respect for yourself?", reverse: false },
+  { id: 19, section: 1, text: "How often do you feel useless or that others would be better off without you?", reverse: false },
+  { id: 20, section: 1, text: "How often do you feel that you are able to handle the challenges that come your way?", reverse: true },
+  // Section 3: Emotional Well-Being (Q21–30)
+  { id: 21, section: 2, text: "How often do you feel able to manage the stress in your life?", reverse: true },
+  { id: 22, section: 2, text: "How often do you feel overwhelmed by your emotions?", reverse: false },
+  { id: 23, section: 2, text: "How often do you feel connected to other people in your life?", reverse: true },
+  { id: 24, section: 2, text: "How often do you feel anxious or on edge without a clear reason?", reverse: false },
+  { id: 25, section: 2, text: "How often do you feel a sense of meaning or purpose in your life?", reverse: true },
+  { id: 26, section: 2, text: "How often are you able to calm yourself down when you feel upset?", reverse: true },
+  { id: 27, section: 2, text: "How often do you feel that your emotions get in the way of your daily life?", reverse: false },
+  { id: 28, section: 2, text: "How often do you find it hard to ask for help when you need it?", reverse: false },
+  { id: 29, section: 2, text: "How often do you feel content and at peace with who you are?", reverse: true },
+  { id: 30, section: 2, text: "How often do you find something enjoyable or meaningful in your day?", reverse: true },
+];
+
+const QUESTION_TEXT_AR = {
+  1: 'كم مرة شعرت بقلة الاهتمام أو المتعة في القيام بالأشياء التي تستمتع بها عادة؟',
+  2: 'كم مرة شعرت بالحزن أو الاكتئاب أو فقدان الأمل؟',
+  3: 'كم مرة واجهت صعوبة في النوم أو البقاء نائماً، أو نمت أكثر من اللازم؟',
+  4: 'كم مرة شعرت بالتعب أو بانخفاض الطاقة؟',
+  5: 'كم مرة كان لديك ضعف في الشهية أو أكلت أكثر من المعتاد؟',
+  6: 'كم مرة شعرت بالسوء تجاه نفسك، أو شعرت أنك فاشل؟',
+  7: 'كم مرة واجهت صعوبة في التركيز على أشياء مثل القراءة أو مشاهدة التلفاز؟',
+  8: 'كم مرة شعرت أن الأمور تسير ببطء لديك، سواء في أفكارك أو حركاتك؟',
+  9: 'كم مرة استيقظت صباحاً وأنت تشعر بإيجابية تجاه اليوم القادم؟',
+  10: 'كم مرة وجدت أنه من السهل أن تضحك أو تجد شيئاً لطيفاً في المواقف اليومية؟',
+  11: 'كم مرة تشعر أنك شخص ذو قيمة، على الأقل على قدم المساواة مع الآخرين؟',
+  12: 'كم مرة تشعر أن لديك عدداً من الصفات الجيدة؟',
+  13: 'كم مرة تشعر أنك فاشل بشكل عام؟',
+  14: 'كم مرة تستطيع القيام بالأشياء بنفس كفاءة معظم الناس؟',
+  15: 'كم مرة تشعر أنه ليس لديك الكثير لتفتخر به؟',
+  16: 'كم مرة تتخذ موقفاً إيجابياً تجاه نفسك؟',
+  17: 'كم مرة تشعر بالرضا عن نفسك؟',
+  18: 'كم مرة تتمنى لو كان لديك احترام أكبر لنفسك؟',
+  19: 'كم مرة تشعر أنك بلا فائدة أو أن الآخرين سيكونون أفضل حالاً بدونك؟',
+  20: 'كم مرة تشعر أنك قادر على التعامل مع التحديات التي تواجهك؟',
+  21: 'كم مرة تشعر أنك قادر على إدارة الضغط في حياتك؟',
+  22: 'كم مرة تشعر أن مشاعرك تطغى عليك؟',
+  23: 'كم مرة تشعر بالتواصل مع الأشخاص الآخرين في حياتك؟',
+  24: 'كم مرة تشعر بالقلق أو التوتر دون سبب واضح؟',
+  25: 'كم مرة تشعر بوجود معنى أو هدف في حياتك؟',
+  26: 'كم مرة تستطيع تهدئة نفسك عندما تشعر بالانزعاج؟',
+  27: 'كم مرة تشعر أن مشاعرك تعيق حياتك اليومية؟',
+  28: 'كم مرة تجد صعوبة في طلب المساعدة عندما تحتاج إليها؟',
+  29: 'كم مرة تشعر بالرضا والسلام مع نفسك كما أنت؟',
+  30: 'كم مرة تجد شيئاً ممتعاً أو ذا معنى في يومك؟'
+};
+
+function getQuestionText(q) {
+  return currentLang === 'ar' ? (QUESTION_TEXT_AR[q.id] || q.text) : q.text;
+}
+
+const OPTIONS = [
+  { label: "Never", score: 0 },
+  { label: "Rarely", score: 1 },
+  { label: "Sometimes", score: 2 },
+  { label: "Often", score: 3 },
+  { label: "Almost Always", score: 4 },
+];
+
+// Crisis trigger: Q6 or Q19 answered "Often" or "Almost Always"
+const CRISIS_QUESTIONS = [6, 19];
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let currentQ = 0;
+let answers = {};
+let crisisTriggered = false;
+let radarChartInst = null;
+let barChartInst = null;
+let aiRunSeq = 0;
+
+// ── NAVIGATION ──────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+}
+
+// ── ASSESSMENT ──────────────────────────────────────────────────────────────
+function startAssessment() {
+  const saved = localStorage.getItem('mindcheck_answers');
+  if (saved) {
+    try { answers = JSON.parse(saved); } catch(e) { answers = {}; }
+  } else {
+    answers = {};
+  }
+  currentQ = 0;
+  crisisTriggered = false;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const total = QUESTIONS.length;
+  const pct = Math.round((Object.keys(answers).length / total) * 100);
+
+  document.getElementById('progressSection').textContent =
+    `Section ${q.section + 1} of 3 — ${SECTIONS[q.section]}`;
+  document.getElementById('progressText').textContent =
+    `${Object.keys(answers).length} / ${total}`;
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  document.getElementById('progressSection').textContent =
+    t('assess.section') + ' ' + (q.section + 1) + ' ' + t('assess.of') + ' 3 — ' + [t('assess.mood'), t('assess.se'), t('assess.wb')][q.section];
+  document.getElementById('qNumber').textContent = t('assess.q') + ' ' + q.id + ' ' + t('assess.of') + ' ' + total;
+  document.getElementById('qText').textContent = getQuestionText(q);
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  OPTIONS.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[q.id] === i ? ' selected' : '');
+    btn.innerHTML = '<span class="option-score">' + (i+1) + '</span><span class="option-label">' + t('opt.' + i) + '</span>';
+    btn.onclick = () => selectOption(i);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('btnPrev').disabled = currentQ === 0;
+  document.getElementById('btnNext').disabled = answers[q.id] === undefined;
+  const nextBtn = document.getElementById('btnNext');
+  nextBtn.textContent = currentQ === total - 1 ? t('assess.finish') : t('assess.next');
+  nextBtn.dataset.islast = currentQ === total - 1 ? 'true' : 'false';
+  document.getElementById('btnPrev').textContent = t('assess.prev');
+
+  // Crisis alert
+  const alert = document.getElementById('crisisAlert');
+  alert.style.display = crisisTriggered ? 'block' : 'none';
+}
+
+function selectOption(idx) {
+  const q = QUESTIONS[currentQ];
+  answers[q.id] = idx;
+  localStorage.setItem('mindcheck_answers', JSON.stringify(answers));
+
+  // Check crisis trigger
+  if (CRISIS_QUESTIONS.includes(q.id) && idx >= 3) {
+    crisisTriggered = true;
+    document.getElementById('crisisAlert').style.display = 'block';
+  }
+
+  document.querySelectorAll('.option-btn').forEach((b, i) => {
+    b.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('btnNext').disabled = false;
+}
+
+function nextQuestion() {
+  if (answers[QUESTIONS[currentQ].id] === undefined) return;
+  if (currentQ === QUESTIONS.length - 1) {
+    computeResults();
+    showPage('results');
+    return;
+  }
+  currentQ++;
+  renderQuestion();
+  document.getElementById('questionCard').style.animation = 'none';
+  requestAnimationFrame(() => {
+    document.getElementById('questionCard').style.animation = 'fadeSlide 0.3s ease';
+  });
+}
+
+function prevQuestion() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+// ── SCORING ─────────────────────────────────────────────────────────────────
+function getScore(qId, answerIdx) {
+  const q = QUESTIONS.find(x => x.id === qId);
+  if (!q) return 0;
+  const raw = OPTIONS[answerIdx].score;
+  return q.reverse ? (4 - raw) : raw;
+}
+
+function computeResults() {
+  const cats = { depression: [], selfesteem: [], wellbeing: [] };
+  QUESTIONS.forEach(q => {
+    const ans = answers[q.id];
+    if (ans === undefined) return;
+    const score = getScore(q.id, ans);
+    cats[SECTION_KEYS[q.section]].push(score);
+  });
+
+  const scores = {};
+  const maxes = {};
+  SECTION_KEYS.forEach(k => {
+    const arr = cats[k];
+    scores[k] = arr.reduce((a, b) => a + b, 0);
+    maxes[k] = arr.length * 4;
+  });
+
+  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+  const totalMax = Object.values(maxes).reduce((a, b) => a + b, 0);
+
+  const pcts = {};
+  SECTION_KEYS.forEach(k => { pcts[k] = maxes[k] > 0 ? Math.round((scores[k] / maxes[k]) * 100) : 0; });
+  const totalPct = Math.round((totalScore / totalMax) * 100);
+
+  // For depression/selfesteem: higher raw score = MORE distress
+  // For wellbeing: higher raw score = MORE distress (we already inverted positives)
+  // Wellness level = inverse of distress
+  function getLevel(pct) {
+    if (pct <= 25) return { label: t('lvl.minimal'), color: '#7C9A7E' };
+    if (pct <= 50) return { label: t('lvl.mild'), color: '#C4916A' };
+    if (pct <= 75) return { label: t('lvl.moderate'), color: '#B07070' };
+    return { label: t('lvl.significant'), color: '#933333' };
+  }
+
+  const hasCrisis = crisisTriggered ||
+    pcts.depression >= 75 || pcts.selfesteem >= 75 || pcts.wellbeing >= 75;
+
+  renderResults({ scores, maxes, pcts, totalPct, totalScore, totalMax, hasCrisis, getLevel });
+}
+
+// ── RESULTS RENDERING ───────────────────────────────────────────────────────
+function renderResults({ scores, maxes, pcts, totalPct, totalScore, totalMax, hasCrisis, getLevel }) {
+  document.getElementById('resultsCrisisBox').style.display = hasCrisis ? 'block' : 'none';
+
+  // Score hero
+  const hero = document.getElementById('scoreHero');
+  const overallLevel = getLevel(totalPct);
+  const catNames = [t('sm.cat1'), t('sm.cat2'), t('sm.cat3')];
+  const catDescriptions = [t('sm.cat1.desc'), t('sm.cat2.desc'), t('sm.cat3.desc')];
+
+  // Store scores as data attrs for Gemini re-run
+  const heroEl = document.getElementById('scoreHero');
+  heroEl.dataset.dep = scores.depression; heroEl.dataset.se = scores.selfesteem; heroEl.dataset.wb = scores.wellbeing;
+  heroEl.dataset.mdep = maxes.depression; heroEl.dataset.mse = maxes.selfesteem; heroEl.dataset.mwb = maxes.wellbeing;
+  heroEl.dataset.pdep = pcts.depression; heroEl.dataset.pse = pcts.selfesteem; heroEl.dataset.pwb = pcts.wellbeing;
+  heroEl.dataset.total = totalScore; heroEl.dataset.tmax = totalMax;
+
+  hero.innerHTML =
+    '<div class="overall-card">' +
+      '<div class="overall-label">' + t("res.overall") + '</div>' +
+      '<div class="overall-score">' + totalScore + '</div>' +
+      '<div class="overall-max">' + t("res.outof") + ' ' + totalMax + '</div>' +
+      '<div class="overall-level">' + overallLevel.label + '</div>' +
+      '<div style="margin-top:16px;font-size:12px;opacity:0.75;line-height:1.6">' + t("res.higher") + '</div>' +
+    '</div>' +
+    SECTION_KEYS.map(function(k, i) {
+      const lv = getLevel(pcts[k]);
+      return '<div class="cat-score-card">' +
+        '<div class="cat-score-label">' + (currentLang === 'ar' ? 'الفئة ' : 'Category ') + (i+1) + '</div>' +
+        '<div class="cat-score-name">' + catNames[i] + '</div>' +
+        '<div class="cat-score-bar-track"><div class="cat-score-bar-fill" style="width:' + pcts[k] + '%;background:' + SECTION_COLORS[i] + '"></div></div>' +
+        '<div class="cat-score-meta"><span>' + scores[k] + ' / ' + maxes[k] + '</span><span class="cat-score-level" style="color:' + lv.color + '">' + lv.label + '</span></div>' +
+        '<p style="font-size:12px;color:var(--text-soft);margin-top:8px">' + catDescriptions[i] + '</p>' +
+      '</div>';
+    }).join('');
+
+  // AI analysis
+  runAIAnalysis({ scores, maxes, pcts, totalScore, totalMax });
+
+  // Pattern indicators
+  renderPatterns(pcts, scores);
+
+  // Score meaning
+  renderScoreMeaning(scores, maxes, pcts, getLevel);
+
+  // Per-question breakdown
+  renderQuestionBreakdown();
+
+  // Charts
+  if (radarChartInst) { radarChartInst.destroy(); radarChartInst = null; }
+  if (barChartInst) { barChartInst.destroy(); barChartInst = null; }
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)';
+  const tickColor = isDark ? '#A0A0A0' : '#6B6B6B';
+  const wellnessPcts = SECTION_KEYS.map(function(k){ return 100 - pcts[k]; });
+
+  radarChartInst = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: [t('sm.cat1'), t('sm.cat2'), t('sm.cat3')],
+      datasets: [{ label: currentLang === 'ar' ? 'الصحة النفسية' : 'Wellness', data: wellnessPcts, backgroundColor: 'rgba(124,154,126,0.2)', borderColor: '#7C9A7E', pointBackgroundColor: '#7C9A7E', borderWidth: 2, pointRadius: 4 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, color: tickColor, font: { size: 10 } }, grid: { color: gridColor }, pointLabels: { color: tickColor, font: { size: 11 } }, angleLines: { color: gridColor } } }, plugins: { legend: { display: false } } }
+  });
+
+  barChartInst = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: [t('sm.cat1'), t('sm.cat2'), t('sm.cat3')],
+      datasets: [{ label: currentLang === 'ar' ? 'مستوى القلق (%)' : 'Concern level (%)', data: SECTION_KEYS.map(function(k){ return pcts[k]; }), backgroundColor: SECTION_COLORS, borderRadius: 8, borderSkipped: false }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor } }, x: { ticks: { color: tickColor, font: { size: 11 } }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+  });
+
+  renderRecommendations(pcts);
+}
+
+// ── AI ANALYSIS ─────────────────────────────────────────────────────────────
+// ── GEMINI CONFIG ────────────────────────────────────────────────────────────
+const GEMINI_KEY = window.GEMINI_KEY || '';
+const GEMINI_MODEL_PREFERENCES = [
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite'
+];
+const MIN_AI_RESPONSE_CHARS = 2200;
+
+function getGeminiKey() {
+  return GEMINI_KEY;
+}
+
+async function getGeminiModelsForKey() {
+  const fallback = GEMINI_MODEL_PREFERENCES.slice();
+  if (!GEMINI_KEY) return fallback;
+  try {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models', {
+      headers: { 'X-goog-api-key': GEMINI_KEY }
+    });
+    const data = await response.json();
+    if (!response.ok || !data.models) return fallback;
+    const supported = data.models
+      .filter(function(model) {
+        return model.supportedGenerationMethods &&
+          model.supportedGenerationMethods.indexOf('generateContent') !== -1;
+      })
+      .map(function(model) { return model.name.replace(/^models\//, ''); });
+    const preferred = GEMINI_MODEL_PREFERENCES.filter(function(name) {
+      return supported.indexOf(name) !== -1;
+    });
+    return preferred.length ? preferred : supported.slice(0, 3);
+  } catch(e) {
+    return fallback;
+  }
+}
+
+async function runAIAnalysis({ scores, maxes, pcts, totalScore, totalMax }) {
+  const runSeq = ++aiRunSeq;
+  const runLang = currentLang;
+  const loadEl = document.getElementById('aiAnalysisLoading');
+  const contentEl = document.getElementById('aiAnalysisContent');
+  loadEl.style.display = 'flex';
+  contentEl.style.display = 'none';
+  contentEl.innerHTML = '';
+
+  const answerLines = QUESTIONS.map(function(q) {
+    const ans = answers[q.id];
+    if (ans === undefined) return null;
+    const qLabel = currentLang === 'ar' ? 'س' : 'Q';
+    const sectionName = [t('assess.mood'), t('assess.se'), t('assess.wb')][q.section];
+    const answerLabel = t('opt.' + ans);
+    const concernLabel = currentLang === 'ar' ? 'مستوى القلق' : 'distress';
+    return qLabel + q.id + ' [' + sectionName + ']: "' + getQuestionText(q) + '" -> ' + answerLabel + ' (' + concernLabel + ': ' + getScore(q.id, ans) + '/4)';
+  }).filter(Boolean).join('\n');
+
+  const lang = t('ai.lang');
+  const isAr = lang === 'arabic';
+  const prompt = (isAr ? 'أنت مختص في التثقيف الصحي النفسي. قام المستخدم بإكمال استبيان تقييم ذاتي. بناءً على إجاباته، اكتب تقريراً شخصياً مفصلاً وواضحاً وصادقاً باللغة العربية الفصحى البسيطة.\n\nالنتائج:\n- درجة المزاج والطاقة: ' + scores.depression + '/' + maxes.depression + ' (' + pcts.depression + '% مستوى القلق)\n- درجة تقدير الذات: ' + scores.selfesteem + '/' + maxes.selfesteem + ' (' + pcts.selfesteem + '% مستوى القلق)\n- درجة الرفاهية العاطفية: ' + scores.wellbeing + '/' + maxes.wellbeing + ' (' + pcts.wellbeing + '% مستوى القلق)\n- الدرجة الإجمالية: ' + totalScore + '/' + totalMax + '\n\nالإجابات الفردية:\n' + answerLines + '\n\nاكتب تحليلاً شخصياً باستخدام هذه العناوين ## بالترتيب:\n\n## ما تكشفه إجاباتك\n3-4 جمل مباشرة تلخص النمط العام، مع ذكر المجالات الأكثر إثارة للقلق والمجالات الأفضل نسبياً.\n\n## الحالات المحتملة التي يجب الانتباه إليها\nسرد 2-4 حالات نفسية مرتبطة بهذا النمط من الإجابات. لكل حالة:\n- اذكر اسمها بوضوح (مثال: اضطراب الاكتئاب الكبير، اضطراب القلق العام، ضعف تقدير الذات)\n- أعطِ مؤشر احتمالية: "محتمل"، "مرجح"، أو "تشير إجاباتك بقوة إلى ذلك"\n- اشرح في 3-4 جمل لماذا يشير هذا النمط إلى هذه الحالة مع الإشارة إلى الأسئلة المحددة\n- أضف دائماً: "ملاحظة: لا يمكن تأكيد التشخيص إلا من قِبل متخصص صحة نفسية مرخص."\n\n## ما يجب عليك فعله - خطوة بخطوة\nأعطِ 5-7 خطوات عملية ومحددة بناءً على النتائج، مع أطر زمنية واضحة. اجعل النص كافياً ومفيداً، وليس مختصراً جداً.\n\n## متى تطلب المساعدة المهنية بشكل عاجل\nكن مباشراً بشأن مستوى الاستعجال بناءً على الدرجات، واذكر علامات الخطر التي تستدعي التواصل الفوري.\n\n## شيء واحد تمسك به\n3-4 جمل دافئة وصادقة تعطي الشخص توجهاً أو أملاً.\n\nالقواعد: لا تستخدم لغة التشخيص السريري. كن واضحاً وإنسانياً. استخدم "أنت". الطول: 800-1000 كلمة. إذا احتجت للاختصار، حافظ على أن يكون التقرير كافياً ومفيداً.' : 'You are a knowledgeable, empathetic mental health educator. A user completed a self-assessment questionnaire. Based on their answers, write a detailed, clear, and honest personal report.\n\nRESULTS:\n- Mood & Energy score: ' + scores.depression + '/' + maxes.depression + ' (' + pcts.depression + '% concern level)\n- Self-Esteem score: ' + scores.selfesteem + '/' + maxes.selfesteem + ' (' + pcts.selfesteem + '% concern level)\n- Emotional Well-Being score: ' + scores.wellbeing + '/' + maxes.wellbeing + ' (' + pcts.wellbeing + '% concern level)\n- Overall distress score: ' + totalScore + '/' + totalMax + '\n\nINDIVIDUAL ANSWERS:\n' + answerLines + '\n\nWrite using these EXACT ## headings in this order:\n\n## What your answers reveal\nIn 3-4 direct sentences, summarize what the overall pattern of answers shows. Be specific — mention which areas are most concerning and which are relatively okay.\n\n## Likely conditions to be aware of\nBased on the scores and individual answers, list 2-4 mental health conditions that this pattern of responses is commonly associated with. For each:\n- Name the condition clearly (e.g. Major Depressive Disorder, Generalized Anxiety Disorder, Dysthymia, Social Anxiety, Low Self-Esteem Disorder, Adjustment Disorder, Emotional Dysregulation, Chronic Loneliness, Burnout)\n- Give a likelihood indicator: "Possible", "Likely", or "Strongly suggested by your answers"\n- Write 3-4 sentences explaining WHY this pattern of answers suggests this condition — be specific about which questions triggered this\n- IMPORTANT: Always include this disclaimer after each condition: "Note: Only a licensed mental health professional can confirm a diagnosis."\n\n## What you should do — step by step\nGive 5-7 numbered, concrete action steps this specific person should take based on their results. Each step should:\n- Be specific and actionable (not generic advice)\n- Be matched to their actual scores (e.g. if self-esteem is low, address that specifically)\n- Include a timeframe where relevant (e.g. "this week", "daily", "within the next month")\n- Cover a mix of: immediate coping strategies, lifestyle changes, when/how to seek professional help\n\n## When to seek professional help urgently\nBased on their scores, be direct about whether they should seek help soon, soon but not urgently, or maintain self-care. If any crisis indicators are present, be very clear and direct.\n\n## One thing to hold onto\n3-4 warm, honest sentences — something genuine and specific to their answers that can give them a sense of direction or hope.\n\nRULES:\n- Be honest and clear — do not sugarcoat if scores are high\n- Use plain everyday language, not medical jargon\n- Always clarify these are educational indicators, not clinical diagnoses\n- Use "you" throughout\n- Target length: 800-1000 words. If the model must be concise, still make the report sufficient and practically useful.\n- Do not add any intro or outro text outside the ## sections');
+
+  // Try each model in order until one works
+  let lastError = '';
+  let bestShortText = '';
+  if (!GEMINI_KEY) {
+    lastError = currentLang === 'ar' ? 'مفتاح Gemini غير موجود' : 'Gemini API key is missing';
+  }
+  const modelsToTry = GEMINI_KEY ? await getGeminiModelsForKey() : [];
+  for (let mi = 0; GEMINI_KEY && mi < modelsToTry.length; mi++) {
+    const model = modelsToTry[mi];
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+    const controller = new AbortController();
+    const timeoutId = setTimeout(function(){ controller.abort(); }, 25000);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': GEMINI_KEY
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            maxOutputTokens: 4096,
+            temperature: 0.65,
+            topP: 0.9
+          }
+        })
+      });
+      clearTimeout(timeoutId);
+      const data = await response.json();
+      if (!response.ok && !data.error) { lastError = 'HTTP ' + response.status; continue; }
+      if (data.error) { lastError = data.error.message; continue; }
+      const candidate = data.candidates && data.candidates[0] ? data.candidates[0] : null;
+      const finishReason = candidate && candidate.finishReason ? candidate.finishReason : '';
+      const text = candidate && candidate.content && candidate.content.parts
+        ? candidate.content.parts.map(function(part){ return part.text || ''; }).join('\n').trim()
+        : '';
+      if (!text) {
+        lastError = finishReason ? ('empty response (' + finishReason + ')') : 'empty response';
+        continue;
+      }
+      if (text.length < MIN_AI_RESPONSE_CHARS) {
+        bestShortText = text.length > bestShortText.length ? text : bestShortText;
+        lastError = 'response too short from ' + model + ' (' + text.length + ' chars)';
+        continue;
+      }
+      if (runSeq !== aiRunSeq || runLang !== currentLang) return;
+      // Success
+      loadEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      contentEl.innerHTML = '<div class="ai-analysis-content">' + formatAIResponse(text) + '</div>';
+      // Update status
+      const dot = document.getElementById('geminiStatusDot');
+      const txt = document.getElementById('geminiStatusText');
+      if (dot) { dot.style.background = '#44AA44'; }
+      if (txt) { txt.textContent = (currentLang === 'ar' ? 'متصل · ' : 'Connected · ') + model; txt.style.color = '#44AA44'; }
+      return;
+    } catch(e) {
+      clearTimeout(timeoutId);
+      lastError = e.name === 'AbortError' ? 'request timed out' : e.message;
+    }
+  }
+
+  if (bestShortText && runSeq === aiRunSeq && runLang === currentLang) {
+    bestShortText += currentLang === 'ar'
+      ? '\n\n## ملاحظة مهمة\nكان رد Gemini أقصر من المطلوب، لذلك أضفنا في الأسفل تحليلاً محلياً مكتملاً مبنياً على درجاتك حتى لا يبقى التقرير ناقصاً.\n\n' + buildLocalAIReport({ scores, maxes, pcts, totalScore, totalMax })
+      : '\n\n## Important note\nGemini returned a shorter answer than requested, so a complete local analysis based on your scores is added below to keep this report useful.\n\n' + buildLocalAIReport({ scores, maxes, pcts, totalScore, totalMax });
+    loadEl.style.display = 'none';
+    contentEl.style.display = 'block';
+    contentEl.innerHTML = '<div class="ai-analysis-content">' + formatAIResponse(bestShortText) + '</div>';
+    const dot = document.getElementById('geminiStatusDot');
+    const txt = document.getElementById('geminiStatusText');
+    if (dot) dot.style.background = '#C4916A';
+    if (txt) { txt.textContent = currentLang === 'ar' ? 'رد قصير · تم إكمال التقرير محلياً' : 'Short response · completed locally'; txt.style.color = '#C4916A'; }
+    return;
+  }
+
+  // All models failed
+  if (runSeq !== aiRunSeq || runLang !== currentLang) return;
+  loadEl.style.display = 'none';
+  contentEl.style.display = 'block';
+  const dot = document.getElementById('geminiStatusDot');
+  const txt = document.getElementById('geminiStatusText');
+  if (dot) dot.style.background = '#C4916A';
+  if (txt) { txt.textContent = currentLang === 'ar' ? 'تعذر Gemini · تم إنشاء تقرير محلي' : 'Gemini unavailable · local report shown'; txt.style.color = '#C4916A'; }
+  const fallback = buildLocalAIReport({ scores, maxes, pcts, totalScore, totalMax });
+  contentEl.innerHTML =
+    '<div class="ai-analysis-content">' +
+      '<div style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.6">' +
+      (currentLang === 'ar'
+        ? 'تعذر الحصول على رد كافٍ من Gemini الآن (<em>' + escapeHTML(lastError) + '</em>). هذا التقرير المحلي مبني على درجاتك وإجاباتك حتى تحصل على تحليل كافٍ بدلاً من صفحة فارغة.'
+        : 'Gemini did not return a sufficient response right now (<em>' + escapeHTML(lastError) + '</em>). This local report is based on your scores and answers so you still get a useful analysis instead of a blank result.') +
+      ' <button onclick="retryAIAnalysis()" style="margin-inline-start:8px;padding:5px 12px;border-radius:8px;border:1px solid var(--light-border);background:var(--page-bg);color:var(--text);font-family:inherit;font-size:12px;cursor:pointer">' + t('res.retry') + '</button>' +
+      '</div>' +
+      formatAIResponse(fallback) +
+    '</div>';
+}
+
+function retryAIAnalysis() {
+  const heroEl = document.getElementById('scoreHero');
+  const sd = heroEl ? heroEl.dataset : {};
+  runAIAnalysis({
+    scores: { depression: parseInt(sd.dep)||0, selfesteem: parseInt(sd.se)||0, wellbeing: parseInt(sd.wb)||0 },
+    maxes:  { depression: parseInt(sd.mdep)||40, selfesteem: parseInt(sd.mse)||40, wellbeing: parseInt(sd.mwb)||40 },
+    pcts:   { depression: parseInt(sd.pdep)||0, selfesteem: parseInt(sd.pse)||0, wellbeing: parseInt(sd.pwb)||0 },
+    totalScore: parseInt(sd.total)||0, totalMax: parseInt(sd.tmax)||120
+  });
+}
+
+function escapeHTML(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildLocalAIReport({ scores, maxes, pcts, totalScore, totalMax }) {
+  const isAr = currentLang === 'ar';
+  const strongest = [
+    { key: 'depression', name: t('sm.cat1'), pct: pcts.depression, score: scores.depression, max: maxes.depression },
+    { key: 'selfesteem', name: t('sm.cat2'), pct: pcts.selfesteem, score: scores.selfesteem, max: maxes.selfesteem },
+    { key: 'wellbeing', name: t('sm.cat3'), pct: pcts.wellbeing, score: scores.wellbeing, max: maxes.wellbeing }
+  ].sort(function(a, b){ return b.pct - a.pct; });
+  const top = strongest[0];
+  const second = strongest[1];
+  const low = strongest[2];
+  const highConcern = strongest.filter(function(item){ return item.pct >= 50; });
+  const urgent = strongest.some(function(item){ return item.pct >= 75; }) || (answers[6] >= 3) || (answers[19] >= 3);
+
+  if (isAr) {
+    return '## ما تكشفه إجاباتك\n' +
+      'تشير درجاتك إلى أن أكثر مجال يحتاج إلى انتباه الآن هو ' + top.name + '، حيث حصلت على ' + top.score + '/' + top.max + ' (' + top.pct + '%). يلي ذلك ' + second.name + ' بدرجة ' + second.score + '/' + second.max + '، بينما كان مجال ' + low.name + ' أقل نسبياً بدرجة ' + low.score + '/' + low.max + '. هذا لا يعني تشخيصاً، لكنه يعطي صورة واضحة عن المناطق التي قد تضغط عليك حالياً وتستحق متابعة عملية.\n\n' +
+      '## الحالات المحتملة التي يجب الانتباه إليها\n' +
+      '- انخفاض المزاج أو أعراض اكتئابية: ' + (pcts.depression >= 50 ? 'مرجح' : 'محتمل') + '. ارتفاع درجة المزاج والطاقة يعني أن المتعة، الطاقة، النوم، التركيز، أو الإحساس بالأمل قد تكون متأثرة. إذا كانت هذه الصعوبات مستمرة لأكثر من أسبوعين أو تؤثر في العمل أو الدراسة أو العلاقات، فالأفضل مناقشتها مع متخصص. ملاحظة: لا يمكن تأكيد التشخيص إلا من قِبل متخصص صحة نفسية مرخص.\n' +
+      '- انخفاض تقدير الذات أو نقد الذات: ' + (pcts.selfesteem >= 50 ? 'مرجح' : 'محتمل') + '. درجة تقدير الذات توضح مقدار الضغط المرتبط بنظرتك لنفسك وقيمتك وقدرتك. عندما تكون هذه الدرجة مرتفعة، قد يكون الحديث الداخلي القاسي أو الشعور بالفشل جزءاً مهماً من المشكلة. ملاحظة: لا يمكن تأكيد التشخيص إلا من قِبل متخصص صحة نفسية مرخص.\n' +
+      '- ضغط عاطفي أو صعوبة في تنظيم المشاعر: ' + (pcts.wellbeing >= 50 ? 'مرجح' : 'محتمل') + '. درجة الرفاهية العاطفية تعكس إدارة الضغط، التواصل مع الآخرين، المعنى، والقدرة على تهدئة النفس. ارتفاعها يشير إلى أنك قد تحتاج إلى أدوات تهدئة ودعم اجتماعي وخطة واضحة لتخفيف الحمل اليومي. ملاحظة: لا يمكن تأكيد التشخيص إلا من قِبل متخصص صحة نفسية مرخص.\n\n' +
+      '## ما يجب عليك فعله - خطوة بخطوة\n' +
+      '1. هذا الأسبوع، اختر مجالاً واحداً فقط للبدء: ' + top.name + '. اكتب أكثر موقفين أو ثلاثة يجعلون هذا المجال أسوأ، ثم اكتب خطوة صغيرة يمكن تنفيذها لكل موقف.\n' +
+      '2. يومياً لمدة 7 أيام، سجّل مزاجك وطاقتك من 0 إلى 10 مع سبب مختصر. هذا يساعدك على رؤية الأنماط بدلاً من الاعتماد على الإحساس العام فقط.\n' +
+      '3. إذا كان النوم أو الطاقة متأثرين، ثبّت وقت الاستيقاظ أولاً قبل محاولة إصلاح كل شيء. اجعل آخر 30-60 دقيقة قبل النوم هادئة قدر الإمكان.\n' +
+      '4. إذا كان تقدير الذات منخفضاً، اكتب كل مساء دليلاً واحداً صغيراً على أنك حاولت أو تحملت أو أنجزت شيئاً، حتى لو كان بسيطاً. الهدف ليس الإيجابية المصطنعة، بل بناء دليل واقعي ضد النقد الذاتي.\n' +
+      '5. تواصل مع شخص موثوق خلال 48 ساعة إذا كانت الدرجات مرتفعة أو إذا كنت تشعر بالعزلة. لا تحتاج أن تشرح كل شيء؛ يكفي أن تقول إنك تمر بفترة ثقيلة وتحتاج إلى وجود شخص يسمعك.\n' +
+      '6. احجز موعداً مع مختص خلال الشهر القادم إذا بقيت الصعوبات مستمرة، أو خلال أسبوع إذا كانت تؤثر بوضوح في نومك أو دراستك أو عملك أو علاقاتك.\n\n' +
+      '## متى تطلب المساعدة المهنية بشكل عاجل\n' +
+      (urgent
+        ? 'بناءً على درجاتك أو بعض الإجابات الحساسة، من الأفضل طلب دعم مهني قريباً وبشكل عاجل إذا كانت لديك أفكار بإيذاء نفسك، أو شعور بأن الآخرين سيكونون أفضل بدونك، أو فقدان شديد للأمل. إذا شعرت أنك غير آمن الآن، تواصل فوراً مع خط أزمات محلي أو اذهب إلى أقرب طوارئ أو أخبر شخصاً موثوقاً ليبقى معك.'
+        : 'لا تظهر النتيجة وحدها أن هناك حالة طارئة، لكن اطلب مساعدة عاجلة إذا ظهرت أفكار بإيذاء نفسك أو الآخرين، أو شعور شديد باليأس، أو عجز عن القيام بالمهام الأساسية، أو تدهور سريع في النوم والأكل والعمل أو الدراسة.') + '\n\n' +
+      '## شيء واحد تمسك به\n' +
+      'هذه النتائج ليست حكماً عليك، بل خريطة أولية لما يحتاج رعاية. حتى عندما تبدو الأرقام ثقيلة، فهي تعطيك نقطة بداية واضحة: اختر خطوة صغيرة، واطلب دعماً واقعياً، وراقب التغير أسبوعاً بعد أسبوع. لا تحتاج أن تصلح كل شيء مرة واحدة؛ المهم أن لا تبقى وحدك مع هذا الحمل.';
+  }
+
+  return '## What your answers reveal\n' +
+    'Your scores suggest that the area needing the most attention right now is ' + top.name + ', where you scored ' + top.score + '/' + top.max + ' (' + top.pct + '%). The next strongest area is ' + second.name + ' at ' + second.score + '/' + second.max + ', while ' + low.name + ' is relatively lower at ' + low.score + '/' + low.max + '. This is not a diagnosis, but it gives a clear map of the areas that may be creating the most pressure in your daily life.\n\n' +
+    '## Likely conditions to be aware of\n' +
+    '- Low mood or depressive symptoms: ' + (pcts.depression >= 50 ? 'Likely' : 'Possible') + '. A higher Mood & Energy score can reflect reduced pleasure, low energy, sleep disruption, concentration problems, or hopelessness. If these difficulties have lasted more than two weeks or are affecting school, work, or relationships, it would be wise to discuss them with a professional. Note: Only a licensed mental health professional can confirm a diagnosis.\n' +
+    '- Low self-esteem or harsh self-criticism: ' + (pcts.selfesteem >= 50 ? 'Likely' : 'Possible') + '. Your self-esteem score reflects pressure around how you see your worth, capability, and value. When this score is elevated, the inner critic can become part of the problem rather than a helpful guide. Note: Only a licensed mental health professional can confirm a diagnosis.\n' +
+    '- Emotional stress or difficulty regulating emotions: ' + (pcts.wellbeing >= 50 ? 'Likely' : 'Possible') + '. Your emotional well-being score reflects stress management, connection, meaning, and the ability to calm yourself. A higher score suggests that practical grounding tools, social support, and a clearer plan may help reduce the load. Note: Only a licensed mental health professional can confirm a diagnosis.\n\n' +
+    '## What you should do — step by step\n' +
+    '1. This week, start with just one area: ' + top.name + '. Write down two or three situations that make it worse, then choose one small action for each situation.\n' +
+    '2. For the next 7 days, rate your mood and energy from 0 to 10 once per day and add one sentence about what affected it. This turns a vague feeling into a pattern you can work with.\n' +
+    '3. If sleep or energy is affected, stabilize your wake-up time first. Make the last 30-60 minutes before bed quieter and lower stimulation where possible.\n' +
+    '4. If self-esteem is low, write one small piece of evidence each evening that you tried, coped, helped, learned, or completed something. The goal is not fake positivity; it is realistic evidence against self-criticism.\n' +
+    '5. Reach out to one trusted person within 48 hours if your scores are high or you feel isolated. You do not need to explain everything; it is enough to say you are having a heavy week and need someone to listen.\n' +
+    '6. Consider booking a mental health appointment within the next month if these difficulties persist, or within a week if they are affecting sleep, school, work, or relationships.\n\n' +
+    '## When to seek professional help urgently\n' +
+    (urgent
+      ? 'Based on your scores or sensitive answers, it would be wise to seek support soon and urgently if you are having thoughts of harming yourself, feeling that others would be better off without you, or feeling intensely hopeless. If you do not feel safe right now, contact a local crisis line, go to the nearest emergency service, or tell a trusted person and ask them to stay with you.'
+      : 'The score alone does not show an immediate emergency, but seek urgent help if you have thoughts of harming yourself or others, intense hopelessness, inability to do basic daily tasks, or a fast decline in sleep, appetite, school, work, or relationships.') + '\n\n' +
+    '## One thing to hold onto\n' +
+    'These results are not a judgment of who you are; they are a map of what needs care. Even when the numbers feel heavy, they give you a starting point: choose one small step, ask for real support, and track change week by week. You do not have to fix everything at once; the important thing is not to carry it alone.';
+}
+
+
+
+function formatAIResponse(text) {
+  text = String(text || '').trim();
+  const sections = text.split(/\n##\s+/);
+  return sections.map(function(sec, i) {
+    if (!sec.trim()) return '';
+    if (i === 0 && !sec.startsWith('#')) {
+      return '<div class="ai-section">' + formatAIBlock(sec.trim()) + '</div>';
+    }
+    const lines = sec.split('\n');
+    const title = escapeHTML(lines[0].replace(/^#+\s*/, '').trim());
+    const body = lines.slice(1).join('\n').trim();
+    return '<div class="ai-section"><div class="ai-section-title">' + title + '</div>' + formatAIBlock(body) + '</div>';
+  }).join('');
+}
+
+function formatAIBlock(text) {
+  const blocks = String(text || '').split(/\n{2,}/).filter(function(block){ return block.trim(); });
+  return blocks.map(function(block) {
+    const lines = block.split('\n').map(function(line){ return line.trim(); }).filter(Boolean);
+    const isList = lines.length > 0 && lines.every(function(line){ return /^([-•]|\d+[.)])\s+/.test(line); });
+    if (isList) {
+      return '<ul>' + lines.map(function(line) {
+        return '<li>' + formatInlineAI(line.replace(/^([-•]|\d+[.)])\s+/, '')) + '</li>';
+      }).join('') + '</ul>';
+    }
+    return '<p>' + formatInlineAI(lines.join(' ')) + '</p>';
+  }).join('');
+}
+
+function formatInlineAI(text) {
+  return escapeHTML(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+
+async function testGeminiKey() {
+  const btn = document.getElementById('testApiBtn');
+  const dot = document.getElementById('geminiStatusDot');
+  const txt = document.getElementById('geminiStatusText');
+  btn.textContent = currentLang === 'ar' ? 'جارٍ الاختبار...' : 'Testing...';
+  btn.disabled = true;
+  dot.style.background = '#F0C040';
+  txt.textContent = currentLang === 'ar' ? 'جارٍ الاتصال بـ Gemini...' : 'Connecting to Gemini...';
+  txt.style.color = 'var(--text-soft)';
+
+  const key = getGeminiKey();
+  if (!key) {
+    btn.textContent = t('res.ai.testbtn');
+    btn.disabled = false;
+    dot.style.background = '#CC4444';
+    txt.textContent = currentLang === 'ar' ? 'مفتاح Gemini غير موجود' : 'Gemini API key is missing';
+    txt.style.color = '#CC4444';
+    return;
+  }
+
+  try {
+    const models = await getGeminiModelsForKey();
+    const model = models[0];
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-goog-api-key': key },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: 'Reply with only the single word: WORKING' }] }],
+        generationConfig: { maxOutputTokens: 10 }
+      })
+    });
+    const data = await r.json();
+    btn.textContent = t('res.ai.testbtn');
+    btn.disabled = false;
+    if (!r.ok || data.error) {
+      dot.style.background = '#CC4444';
+      txt.textContent = (currentLang === 'ar' ? 'خطأ: ' : 'Error: ') + (data.error ? data.error.message : ('HTTP ' + r.status));
+      txt.style.color = '#CC4444';
+    } else {
+      const reply = data.candidates && data.candidates[0] &&
+        data.candidates[0].content && data.candidates[0].content.parts &&
+        data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : '?';
+      dot.style.background = '#44AA44';
+      txt.textContent = (currentLang === 'ar' ? 'متصل — ' : 'Connected — ') + model + ': "' + reply.trim() + '"';
+      txt.style.color = '#44AA44';
+    }
+  } catch(e) {
+    btn.textContent = t('res.ai.testbtn');
+    btn.disabled = false;
+    dot.style.background = '#CC4444';
+    txt.textContent = (currentLang === 'ar' ? 'فشل: ' : 'Failed: ') + e.message;
+    txt.style.color = '#CC4444';
+  }
+}
+
+// ── PATTERN INDICATORS ───────────────────────────────────────────────────────
+function renderPatterns(pcts, scores) {
+  const grid = document.getElementById('patternGrid');
+  const isAr = currentLang === 'ar';
+
+  // Calculate sub-patterns from specific question scores
+  function qDistress(id) {
+    const ans = answers[id]; if (ans === undefined) return 0;
+    return getScore(id, ans);
+  }
+
+  const patNames = [t('pat.depression'), t('pat.selfcrit'), t('pat.selfworth'), t('pat.lonely'), t('pat.overwhelm'), t('pat.anxiety'), t('pat.meaning'), t('pat.sleep')];
+  const patDetected = [t('pat.detected'), t('pat.mild'), t('pat.none')];
+  const patDescs = isAr ? [
+    'انخفاض مستمر في الطاقة والمتعة وصعوبة في التركيز. يؤثر ذلك في طريقة عيشك لتفاصيل اليوم.',
+    'ناقد داخلي قاسٍ، مثل الشعور بالفشل أو عدم وجود ما تفخر به. قد يكون هذا مؤلماً أكثر من الحزن نفسه.',
+    'إحساس متكرر بأنك أقل قيمة أو قدرة من الآخرين. يرتبط أحياناً بتجارب سابقة أو أنماط تفكير قديمة.',
+    'الشعور بالانفصال عن الآخرين حتى عندما يكون الناس حولك. تؤثر الوحدة بعمق في المزاج والصحة ونظرتك لنفسك.',
+    'المشاعر تبدو أكبر من قدرتك على إدارتها، فتتداخل مع الحياة اليومية وتجعل المهام البسيطة أصعب.',
+    'إحساس خلفي بالخوف أو التوتر دون سبب واضح. قد يجعل الاسترخاء أو النوم أو الشعور بالأمان أصعب.',
+    'الشعور بأن الحياة تفتقد الاتجاه أو أن الأشياء لا تهم. يظهر هذا كثيراً مع الاكتئاب أو الاحتراق النفسي.',
+    'اضطراب النوم مع انخفاض الطاقة. هذه إشارة مهمة إلى أن الجسم والعقل تحت ضغط.'
+  ] : [
+    'Persistent low energy, reduced pleasure in activities, difficulty concentrating. Affects how you experience daily life.',
+    'A harsh inner critic — feeling like a failure, feeling you have nothing to be proud of. Often more painful than sadness.',
+    'A persistent sense that you are less worthy, capable, or valuable than others. Often tied to early experiences.',
+    'Feeling cut off from others, even when people are around. Loneliness affects mood, health, and self-perception deeply.',
+    'Emotions feel too big to manage — they flood daily life and make simple tasks harder than they should be.',
+    'A background sense of dread or unease without a clear cause. Can make it hard to relax, sleep, or feel safe.',
+    'Feeling like life lacks direction or that things don\'t matter. Often accompanies depression and burnout.',
+    'Poor or excessive sleep combined with low energy. A key sign the body and mind are under strain.'
+  ];
+  const patterns = [
+    {
+      name: patNames[0],
+      signal: pcts.depression >= 50 ? patDetected[0] : pcts.depression >= 25 ? patDetected[1] : patDetected[2],
+      level: pcts.depression >= 50 ? 'high' : pcts.depression >= 25 ? 'mild' : 'low',
+      desc: patDescs[0],
+      questions: isAr ? 'أسئلة المزاج والطاقة' : 'Based on mood and energy questions',
+      color: '#7C9A7E'
+    },
+    {
+      name: patNames[1],
+      signal: (qDistress(6) + qDistress(13) + qDistress(15)) >= 6 ? patDetected[0] : (qDistress(6) + qDistress(13) + qDistress(15)) >= 3 ? patDetected[1] : patDetected[2],
+      level: (qDistress(6) + qDistress(13) + qDistress(15)) >= 6 ? 'high' : (qDistress(6) + qDistress(13) + qDistress(15)) >= 3 ? 'mild' : 'low',
+      desc: patDescs[1],
+      questions: 'Q6, Q13, Q15',
+      color: '#C4916A'
+    },
+    {
+      name: patNames[2],
+      signal: pcts.selfesteem >= 50 ? 'detected' : pcts.selfesteem >= 25 ? 'mild signs' : 'not detected',
+      level: pcts.selfesteem >= 50 ? 'high' : pcts.selfesteem >= 25 ? 'mild' : 'low',
+      desc: patDescs[2],
+      questions: isAr ? 'أسئلة تقدير الذات' : 'Based on self-esteem questions',
+      color: '#6B8CAE'
+    },
+    {
+      name: patNames[3],
+      signal: qDistress(23) >= 3 ? patDetected[0] : qDistress(23) >= 2 ? patDetected[1] : patDetected[2],
+      level: qDistress(23) >= 3 ? 'high' : qDistress(23) >= 2 ? 'mild' : 'low',
+      desc: patDescs[3],
+      questions: isAr ? 'س23 (التواصل مع الآخرين)' : 'Q23 (connection to others)',
+      color: '#B07070'
+    },
+    {
+      name: patNames[4],
+      signal: (qDistress(22) + qDistress(27)) >= 5 ? patDetected[0] : (qDistress(22) + qDistress(27)) >= 3 ? patDetected[1] : patDetected[2],
+      level: (qDistress(22) + qDistress(27)) >= 5 ? 'high' : (qDistress(22) + qDistress(27)) >= 3 ? 'mild' : 'low',
+      desc: patDescs[4],
+      questions: isAr ? 'س22، س27' : 'Q22, Q27',
+      color: '#9B7FBD'
+    },
+    {
+      name: patNames[5],
+      signal: qDistress(24) >= 3 ? patDetected[0] : qDistress(24) >= 2 ? patDetected[1] : patDetected[2],
+      level: qDistress(24) >= 3 ? 'high' : qDistress(24) >= 2 ? 'mild' : 'low',
+      desc: patDescs[5],
+      questions: isAr ? 'س24' : 'Q24',
+      color: '#7BA3A8'
+    },
+    {
+      name: patNames[6],
+      signal: qDistress(25) >= 3 ? patDetected[0] : qDistress(25) >= 2 ? patDetected[1] : patDetected[2],
+      level: qDistress(25) >= 3 ? 'high' : qDistress(25) >= 2 ? 'mild' : 'low',
+      desc: patDescs[6],
+      questions: isAr ? 'س25' : 'Q25',
+      color: '#A68060'
+    },
+    {
+      name: patNames[7],
+      signal: qDistress(3) >= 3 && qDistress(4) >= 3 ? patDetected[0] : qDistress(3) >= 2 || qDistress(4) >= 2 ? patDetected[1] : patDetected[2],
+      level: qDistress(3) >= 3 && qDistress(4) >= 3 ? 'high' : qDistress(3) >= 2 || qDistress(4) >= 2 ? 'mild' : 'low',
+      desc: patDescs[7],
+      questions: isAr ? 'س3، س4' : 'Q3, Q4',
+      color: '#5E8E8A'
+    }
+  ];
+
+  const levelConfig = {
+    'high':  { bg: 'var(--rose-light)', textColor: 'var(--rose)', accentColor: '#B07070', label: t('pat.detected') },
+    'mild':  { bg: 'var(--accent-light)', textColor: 'var(--accent)', accentColor: '#C4916A', label: t('pat.mild') },
+    'low':   { bg: 'var(--page-bg)', textColor: 'var(--text-soft)', accentColor: 'var(--light-border)', label: t('pat.none') }
+  };
+
+  grid.innerHTML = patterns.map(function(p) {
+    const cfg = levelConfig[p.level];
+    return '<div class="pattern-card">' +
+      '<div class="pattern-card-accent" style="background:' + cfg.accentColor + '"></div>' +
+      '<span class="pattern-level-badge" style="background:' + cfg.bg + ';color:' + cfg.textColor + '">' + cfg.label + '</span>' +
+      '<div class="pattern-name">' + p.name + '</div>' +
+      '<div class="pattern-desc">' + p.desc + '</div>' +
+      '<div class="pattern-signal" style="color:' + cfg.textColor + '">' + t('pat.source') + ' ' + p.questions + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── SCORE MEANING ────────────────────────────────────────────────────────────
+function renderScoreMeaning(scores, maxes, pcts, getLevel) {
+  const container = document.getElementById('scoreMeaning');
+  const catNames = [t('sm.cat1'), t('sm.cat2'), t('sm.cat3')];
+  const catKeys = SECTION_KEYS;
+  const isAr = currentLang === 'ar';
+
+  const rangeData = isAr ? [
+    [
+      { range: '0–10', pct: 25, label: 'بسيط', desc: 'يبدو أن المزاج والطاقة مستقران نسبياً، مع وجود اهتمام وطاقة معقولين في الحياة اليومية.' },
+      { range: '11–20', pct: 50, label: 'خفيف', desc: 'توجد بعض الانخفاضات في المزاج أو الطاقة، مثل الشعور بالفتور أو قلة الدافعية أكثر مما ترغب.' },
+      { range: '21–30', pct: 75, label: 'متوسط', desc: 'توجد صعوبات مزاجية ملحوظة، مثل استمرار المشاعر المنخفضة أو التعب أو انخفاض الاستمتاع بالحياة.' },
+      { range: '31–40', pct: 100, label: 'كبير', desc: 'توجد مؤشرات قوية على أعراض اكتئابية، وقد يتأثر النوم والتركيز والأداء اليومي.' }
+    ],
+    [
+      { range: '0–10', pct: 25, label: 'بسيط', desc: 'يبدو أن لديك إحساساً صحياً نسبياً بالقيمة الذاتية والثقة في قدراتك.' },
+      { range: '11–20', pct: 50, label: 'خفيف', desc: 'يوجد بعض الشك أو النقد الذاتي، وقد تقارن نفسك بالآخرين بطريقة قاسية أحياناً.' },
+      { range: '21–30', pct: 75, label: 'متوسط', desc: 'انخفاض تقدير الذات يؤثر بوضوح في نظرتك لنفسك، وربما يظهر كشعور بالفشل أو قلة القيمة.' },
+      { range: '31–40', pct: 100, label: 'كبير', desc: 'تقدير الذات منخفض جداً، وقد تجد صعوبة في رؤية قيمتك أو الشعور بالفخر والرضا عن نفسك.' }
+    ],
+    [
+      { range: '0–10', pct: 25, label: 'بسيط', desc: 'توجد مرونة عاطفية جيدة نسبياً، وغالباً تستطيع إدارة الضغط والحفاظ على التواصل والمعنى.' },
+      { range: '11–20', pct: 50, label: 'خفيف', desc: 'توجد بعض الصعوبات في إدارة الضغط أو تنظيم المشاعر، وقد تشعر أحياناً بالإرهاق أو الانفصال.' },
+      { range: '21–30', pct: 75, label: 'متوسط', desc: 'الرفاهية العاطفية متأثرة بوضوح، وقد يبدو الضغط صعب الإدارة وتتداخل المشاعر مع الحياة اليومية.' },
+      { range: '31–40', pct: 100, label: 'كبير', desc: 'توجد ضائقة عاطفية عالية، مثل الشعور المتكرر بالإرهاق أو العزلة أو فقدان الهدف.' }
+    ]
+  ] : [
+    [
+      { range: '0–10', pct: 25, label: 'Minimal', desc: 'Mood and energy appear stable. You generally feel interested in life and have reasonable energy.' },
+      { range: '11–20', pct: 50, label: 'Mild', desc: 'Some dips in mood or energy — perhaps feeling flat or unmotivated more often than you\'d like.' },
+      { range: '21–30', pct: 75, label: 'Moderate', desc: 'Noticeable mood difficulties — possibly persistent low feelings, fatigue, or reduced enjoyment of life.' },
+      { range: '31–40', pct: 100, label: 'Significant', desc: 'Strong indicators of depressive symptoms. Sleep, concentration, and daily functioning may be affected.' }
+    ],
+    [
+      { range: '0–10', pct: 25, label: 'Minimal', desc: 'You appear to have a reasonably healthy sense of self-worth and confidence in your abilities.' },
+      { range: '11–20', pct: 50, label: 'Mild', desc: 'Some self-doubt or self-criticism present. You may compare yourself unfavourably to others at times.' },
+      { range: '21–30', pct: 75, label: 'Moderate', desc: 'Low self-esteem is significantly affecting how you see yourself — possibly feelings of failure or worthlessness.' },
+      { range: '31–40', pct: 100, label: 'Significant', desc: 'Very low self-esteem. You may struggle to see your own value and feel little pride or satisfaction in yourself.' }
+    ],
+    [
+      { range: '0–10', pct: 25, label: 'Minimal', desc: 'Good emotional resilience — you generally manage stress and maintain a sense of connection and meaning.' },
+      { range: '11–20', pct: 50, label: 'Mild', desc: 'Some struggles with stress or emotional regulation. You may sometimes feel overwhelmed or disconnected.' },
+      { range: '21–30', pct: 75, label: 'Moderate', desc: 'Emotional well-being is clearly strained — stress feels hard to manage and emotions may intrude on daily life.' },
+      { range: '31–40', pct: 100, label: 'Significant', desc: 'High emotional distress — feeling overwhelmed, isolated, or without purpose is likely a frequent experience.' }
+    ]
+  ];
+
+  container.innerHTML = catKeys.map(function(k, i) {
+    const score = scores[k];
+    const max = maxes[k];
+    const pct = pcts[k];
+    const lv = getLevel(pct);
+    const ranges = rangeData[i];
+    const activeRange = pct <= 25 ? 0 : pct <= 50 ? 1 : pct <= 75 ? 2 : 3;
+    const yourRangeDesc = ranges[activeRange].desc;
+
+    return '<div class="sm-card" id="smcard' + i + '">' +
+      '<div class="sm-card-header" onclick="toggleSMCard(' + i + ')" id="smhead' + i + '">' +
+        '<div class="sm-card-left">' +
+          '<div class="sm-card-dot" style="background:' + SECTION_COLORS[i] + '"></div>' +
+          '<div class="sm-card-title">' + catNames[i] + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:12px">' +
+          '<div class="sm-card-score-pill" style="background:' + lv.color + '22;color:' + lv.color + '">' + score + ' / ' + max + ' &nbsp;·&nbsp; ' + lv.label + '</div>' +
+          '<div class="sm-toggle-icon">▾</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sm-card-body" id="smbody' + i + '">' +
+        '<div class="sm-score-track"><div class="sm-score-fill" style="width:' + pct + '%;background:' + SECTION_COLORS[i] + '"></div></div>' +
+        '<div class="sm-score-range-labels"><span>0 ' + t("sm.no") + '</span><span>' + max + ' ' + t("sm.max") + '</span></div>' +
+        '<div class="sm-meaning-grid">' +
+          ranges.map(function(r, ri) {
+            const isActive = ri === activeRange;
+            const bgs = ['#EBF3EB','#FDF3EB','#FDE8E8','#F5E0E0'];
+            const txts = ['#3A6B3A','#8B5A2B','#8B2A2A','#600000'];
+            return '<div class="sm-range-box' + (isActive ? ' active' : '') + '" style="background:' + (isActive ? bgs[ri] : 'var(--page-bg)') + ';color:' + (isActive ? txts[ri] : 'var(--text-soft)') + ';border-color:' + (isActive ? txts[ri] : 'transparent') + '">' +
+              '<div class="sm-range-label">' + r.label + '</div>' +
+              '<div class="sm-range-scores">' + r.range + '</div>' +
+              '<div class="sm-range-desc" style="color:' + (isActive ? txts[ri] : 'var(--text-soft)') + '">' + (isActive ? (isAr ? 'درجتك' : 'Your score') : r.range + (isAr ? ' نقطة' : ' pts')) + '</div>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '<div class="sm-your-score"><strong>' + t("sm.yourscore") + ' ' + score + (isAr ? t("sm.yourscore2") : ':') + '</strong> ' + yourRangeDesc + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Auto-open first card
+  setTimeout(function(){ toggleSMCard(0); }, 100);
+}
+
+function toggleSMCard(i) {
+  const body = document.getElementById('smbody' + i);
+  const head = document.getElementById('smhead' + i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  head.classList.toggle('open', !isOpen);
+}
+
+// ── QUESTION BREAKDOWN ───────────────────────────────────────────────────────
+function renderQuestionBreakdown() {
+  const wrap = document.getElementById('questionBreakdown');
+  const answerColors = ['#6AAB6A','#8AAB6A','#C4916A','#B07070','#933333'];
+  const answerBgs = ['#EBF5EB','#EFF5E8','#FDF3EB','#F5E8E8','#F0DADA'];
+
+  const sections = SECTIONS.map(function(sName, si) {
+    const qs = QUESTIONS.filter(function(q){ return q.section === si; });
+    const items = qs.map(function(q) {
+      const ans = answers[q.id];
+      if (ans === undefined) return '';
+      const distress = getScore(q.id, ans);
+      const optLabel = t('opt.' + ans);
+      const isFlagged = CRISIS_QUESTIONS.includes(q.id) && ans >= 3;
+      const col = answerColors[ans];
+      const bg = answerBgs[ans];
+      const qPrefix = currentLang === 'ar' ? 'س' : 'Q';
+      const flagText = currentLang === 'ar' ? '⚠ هذه الإجابة فعّلت تنبيهاً للاطمئنان على الرفاهية' : '⚠ This response triggered a wellbeing check';
+      const concernText = currentLang === 'ar' ? 'القلق: ' : 'Concern: ';
+      return '<div class="qb-item">' +
+        '<div><div class="qb-q-num">' + qPrefix + q.id + '</div>' +
+        '<div class="qb-q">' + getQuestionText(q) + '</div>' +
+        (isFlagged ? '<div class="qb-flag">' + flagText + '</div>' : '') +
+        '</div>' +
+        '<div class="qb-right">' +
+          '<div class="qb-answer" style="background:' + bg + ';color:' + col + '">' + optLabel + '</div>' +
+          '<div class="qb-score">' + concernText + distress + '/4</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    const sNameT = [t('assess.mood'), t('assess.se'), t('assess.wb')][si];
+    return '<div class="qb-section">' +
+      '<div class="qb-section-title">' + sNameT + '</div>' +
+      items +
+    '</div>';
+  });
+
+  wrap.innerHTML = sections.join('');
+}
+
+function renderRecommendations(pcts) {
+  const grid = document.getElementById('recsGrid');
+  const recs = [];
+  const isAr = currentLang === 'ar';
+
+  if (pcts.depression >= 25) {
+    recs.push({ icon: '🌙', title: isAr ? 'تنظيم النوم' : 'Sleep hygiene', text: isAr ? 'حاول النوم والاستيقاظ في الوقت نفسه يومياً. قلل استخدام الشاشات قبل النوم بـ 60 دقيقة، فالروتين المنتظم يساعد المزاج كثيراً.' : 'Try going to bed and waking at the same time daily. Limit screens 60 min before sleep. A consistent routine helps regulate mood significantly.' });
+    recs.push({ icon: '🚶', title: isAr ? 'حركة خفيفة' : 'Gentle movement', text: isAr ? 'المشي 20-30 دقيقة في الخارج 3-4 مرات أسبوعياً له دليل قوي في تحسين المزاج المنخفض. ابدأ صغيراً، حتى 10 دقائق مفيدة.' : 'A 20–30 minute walk outdoors 3–4 times a week has strong evidence for improving low mood. Start small — even 10 minutes helps.' });
+    recs.push({ icon: '📓', title: isAr ? 'تدوين المزاج' : 'Mood journaling', text: isAr ? 'اكتب عن مشاعرك 10 دقائق كل مساء. يساعد التعبير الكتابي على معالجة المشاعر وتقليل الأعراض الاكتئابية.' : 'Spend 10 minutes writing about your feelings each evening. Research shows expressive writing helps process emotions and reduce depressive symptoms.' });
+  }
+  if (pcts.depression >= 50) {
+    recs.push({ icon: '☀️', title: isAr ? 'تنشيط السلوك' : 'Behavioural activation', text: isAr ? 'الاكتئاب يقلل الدافعية، لكن الفعل قد يسبق الدافعية. ضع نشاطاً صغيراً وممتعاً يومياً حتى عندما لا تشعر بالرغبة.' : 'Depression reduces motivation, but action can precede motivation — not the other way. Schedule one small enjoyable activity daily, even when you don\'t feel like it.' });
+  }
+
+  if (pcts.selfesteem >= 25) {
+    recs.push({ icon: '💌', title: isAr ? 'ممارسة التعاطف مع الذات' : 'Self-compassion practice', text: isAr ? 'عندما تلاحظ النقد الذاتي، اسأل: "ماذا سأقول لصديق قريب في هذا الموقف؟" ثم قل ذلك لنفسك.' : 'When you notice self-criticism, ask: "What would I say to a close friend in this situation?" Then say that to yourself. This is a core skill in Compassion-Focused Therapy.' });
+    recs.push({ icon: '🎯', title: isAr ? 'أهداف صغيرة' : 'Small goal-setting', text: isAr ? 'ضع هدفاً واحداً قابلاً للتحقيق كل أسبوع. تحقيق الأهداف الصغيرة يبني دليلاً عملياً على كفاءتك وقيمتك.' : 'Set one achievable goal per week. Achieving even small goals builds evidence for your competence and worth — a counter-narrative to low self-esteem beliefs.' });
+  }
+  if (pcts.selfesteem >= 50) {
+    recs.push({ icon: '🪞', title: isAr ? 'تأمل إيجابي' : 'Positive reflection', text: isAr ? 'كل ليلة، اكتب 3 أشياء فعلتها أو صفات ظهرت فيك وتشعر تجاهها بالحياد أو الرضا. مع الوقت يضعف هذا نمط النقد الذاتي.' : 'Each night, write down 3 things you did or were today that you feel neutral or good about. Over time this rewires habitual self-critical thinking patterns.' });
+    recs.push({ icon: '🤝', title: isAr ? 'تواصل موثوق' : 'Trusted connection', text: isAr ? 'غالباً ينمو انخفاض تقدير الذات في العزلة. التواصل مع شخص موثوق، حتى باختصار، قد يكون خطوة قوية لاستعادة الإحساس بالقيمة.' : 'Low self-esteem often grows in isolation. Reaching out to one trusted person — even briefly — can be a powerful first step toward rebuilding self-worth.' });
+  }
+
+  if (pcts.wellbeing >= 25) {
+    recs.push({ icon: '🫁', title: isAr ? 'تنفس الصندوق' : 'Box breathing', text: isAr ? 'خذ شهيقاً 4 عدات، احبس النفس 4، ازفر 4، ثم توقف 4. كرر 4 دورات. يساعد هذا خاصة وقت الإرهاق.' : 'Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 cycles. Activates the parasympathetic nervous system — particularly effective during moments of overwhelm.' });
+    recs.push({ icon: '🧘', title: isAr ? 'أساسيات اليقظة' : 'Mindfulness basics', text: isAr ? 'جرب 5 دقائق يومياً من تأمل فحص الجسد. الاستمرارية أهم من طول المدة عند البداية.' : 'Try 5 minutes of body-scan meditation daily. Apps like Insight Timer offer free guided sessions. Consistency matters more than duration when starting out.' });
+  }
+  if (pcts.wellbeing >= 50) {
+    recs.push({ icon: '🗓️', title: isAr ? 'إدارة الوقت' : 'Time management', text: isAr ? 'اكتب أهم 3 أولويات للغد هذه الليلة. ترتيب الأولويات يقلل عبء القرارات والشعور بالتشتت.' : 'Write tomorrow\'s top 3 priorities tonight. Prioritising reduces the cognitive load of decision-making and the overwhelm that comes with feeling scattered.' });
+    recs.push({ icon: '🌿', title: isAr ? 'وقت في الطبيعة' : 'Nature exposure', text: isAr ? 'قضاء 20 دقيقة في بيئة طبيعية مثل حديقة أو قرب الماء قد يساعد تنظيم التوتر والمشاعر. اجعله عادة أسبوعية.' : 'Spending 20 minutes in a natural environment (park, garden, water) has measurable effects on cortisol levels and emotional regulation. Make it a weekly habit.' });
+  }
+
+  // Add a default if low concerns
+  if (recs.length === 0) {
+    recs.push({ icon: '✨', title: isAr ? 'استمر' : 'Keep it up', text: isAr ? 'تشير إجاباتك إلى أنك تدير صحتك النفسية بشكل جيد. حافظ على عاداتك الحالية وراجع نفسك دورياً.' : 'Your responses suggest you\'re managing your mental wellness well. Continue with your current habits and check in periodically — wellness is an ongoing practice.' });
+    recs.push({ icon: '🧠', title: isAr ? 'ابقَ مطلعاً' : 'Stay informed', text: isAr ? 'التعلم عن الصحة النفسية يقلل الوصمة ويساعدك على دعم نفسك والآخرين. استكشف صفحة الموارد للتثقيف وأدوات المساعدة الذاتية.' : 'Learning about mental health reduces stigma and helps you support others. Explore our Resources page for education and self-help tools.' });
+  }
+
+  recs.push({ icon: '🩺', title: isAr ? 'دعم متخصص' : 'Professional support', text: isAr ? 'بغض النظر عن درجتك، الحديث مع معالج أو مستشار خيار صحيح ومفيد دائماً، وليس فقط وقت الأزمات. العلاج أداة للنمو في أي مستوى.' : 'Regardless of your score, speaking with a therapist or counselor is always a valid and valuable choice — not just in crisis. Therapy is a tool for growth at any level.' });
+
+  grid.innerHTML = recs.map(r => `
+    <div class="rec-card">
+      <div class="rec-card-icon">${r.icon}</div>
+      <h4>${r.title}</h4>
+      <p>${r.text}</p>
+    </div>
+  `).join('');
+}
+
+
+// ── LANGUAGE SYSTEM ──────────────────────────────────────────────────────────
+let currentLang = 'en';
+
+const T = {
+  en: {
+    // Nav
+    'nav.home': 'Home', 'nav.assessment': 'Assessment', 'nav.resources': 'Resources',
+    // Landing
+    'land.tag': 'Free · Private · Non-diagnostic',
+    'land.h1a': 'Understand your', 'land.h1b': 'mental wellness', 'land.h1c': 'better',
+    'land.sub': 'A thoughtful, science-inspired self-assessment covering mood, self-esteem, and emotional well-being. Takes 10–15 minutes. Completely private.',
+    'land.start': 'Start Assessment', 'land.learn': 'Learn more',
+    'land.privacy': 'Your responses are never sent anywhere — all data stays in your browser only.',
+    'land.f1t': '30 thoughtful questions', 'land.f1p': 'Carefully crafted questions covering three dimensions of mental wellness, inspired by established screening frameworks.',
+    'land.f2t': 'Visual results dashboard', 'land.f2p': "See your scores visualized with charts, category breakdowns, and plain-language explanations of what they mean.",
+    'land.f3t': 'Personalized guidance', 'land.f3p': 'Receive tailored, evidence-based self-care recommendations specific to your results — supportive, not prescriptive.',
+    'land.disc': 'This assessment is not a medical diagnosis. Results are educational and informational only. If you are experiencing significant emotional distress or concerns about your mental health, please seek support from a qualified mental health professional.',
+    'land.disc.strong': 'Important:',
+    // Assessment
+    'assess.section': 'Section', 'assess.of': 'of', 'assess.mood': 'Mood & Energy',
+    'assess.se': 'Self-Esteem & Self-Image', 'assess.wb': 'Emotional Well-Being',
+    'assess.q': 'Question', 'assess.prev': '← Back', 'assess.next': 'Next →', 'assess.finish': 'See Results →',
+    'assess.crisis': 'We noticed something important. Your response suggests you may be experiencing significant distress. Please consider reaching out to a trusted person or mental health professional. You are not alone.',
+    'assess.crisis.strong': 'We noticed something important.',
+    'assess.crisis.support': 'Crisis support:',
+    // Options
+    'opt.0': 'Never', 'opt.1': 'Rarely', 'opt.2': 'Sometimes', 'opt.3': 'Often', 'opt.4': 'Almost Always',
+    // Results
+    'res.h1a': 'Your Wellness', 'res.h1b': 'Report',
+    'res.sub': 'A detailed breakdown of every score, what it means, and an AI-written personal analysis of your answers.',
+    'res.crisis.h': 'Please reach out for support',
+    'res.crisis.p': 'Your responses suggest you may be experiencing significant emotional distress. This assessment cannot diagnose anything, but your feelings are real and valid — and support is available.',
+    'res.overall': 'Overall distress score', 'res.outof': 'out of',
+    'res.higher': 'Higher score = more concerns detected. Lower score = fewer concerns.',
+    'res.ai.badge': 'AI Analysis', 'res.ai.powered': 'Powered by Google Gemini (free) · Not a clinical diagnosis',
+    'res.ai.loading': 'Analyzing your responses...', 'res.ai.testbtn': 'Test API',
+    'res.ai.notested': 'Not tested yet',
+    'res.patterns.h': 'What your answers suggest',
+    'res.patterns.sub': 'These are patterns detected in your responses — not diagnoses. Think of them as areas worth paying attention to.',
+    'res.score.h': 'Your score, explained',
+    'res.score.sub': 'Each section is scored 0–40. Here\'s exactly what your numbers mean in plain language.',
+    'res.qb.h': 'Question-by-question breakdown',
+    'res.qb.sub': 'See how you answered each question and what each response reflects.',
+    'res.charts.radar': 'Wellness radar', 'res.charts.bar': 'Concern levels',
+    'res.disc': 'This assessment is not a medical diagnosis. Results are educational and informational only. If you are experiencing significant emotional distress, please consult a qualified mental health professional.',
+    'res.disc.strong': 'Reminder:',
+    'res.recs.h': 'Personalized recommendations',
+    'res.retake': 'Retake assessment', 'res.explore': 'Explore resources',
+    'res.retry': 'Retry analysis',
+    // Pattern names
+    'pat.depression': 'Low mood / Depression', 'pat.selfcrit': 'Self-criticism / Shame',
+    'pat.selfworth': 'Low self-worth', 'pat.lonely': 'Loneliness / Disconnection',
+    'pat.overwhelm': 'Emotional overwhelm', 'pat.anxiety': 'Anxiety / Tension',
+    'pat.meaning': 'Loss of meaning / Purpose', 'pat.sleep': 'Sleep & energy disruption',
+    'pat.detected': 'Detected', 'pat.mild': 'Mild signs', 'pat.none': 'Not detected',
+    'pat.source': 'Signal source:',
+    // Score levels
+    'lvl.minimal': 'Minimal concerns', 'lvl.mild': 'Mild concerns',
+    'lvl.moderate': 'Moderate concerns', 'lvl.significant': 'Significant concerns',
+    // Score meaning
+    'sm.cat1': 'Mood & Energy', 'sm.cat2': 'Self-Esteem', 'sm.cat3': 'Emotional Well-Being',
+    'sm.cat1.desc': 'Reflects patterns related to mood, energy, interest, and sleep.',
+    'sm.cat2.desc': 'Reflects how you view and evaluate yourself and your worth.',
+    'sm.cat3.desc': 'Reflects your ability to manage stress, connect with others, and find meaning.',
+    'sm.no': '(no concerns)', 'sm.max': '(max concerns)', 'sm.yourscore': 'Your score of',
+    'sm.yourscore2': '',
+    // Resources
+    'res_page.h': 'Resources & Support',
+    'res_page.sub': 'Education, self-help tools, and professional guidance to support your mental well-being journey.',
+    // AI prompt language
+    'ai.lang': 'english',
+  },
+  ar: {
+    'nav.home': 'الرئيسية', 'nav.assessment': 'التقييم', 'nav.resources': 'الموارد',
+    'land.tag': 'مجاني · خاص · غير تشخيصي',
+    'land.h1a': 'افهم', 'land.h1b': 'صحتك النفسية', 'land.h1c': 'بشكل أفضل',
+    'land.sub': 'تقييم ذاتي مدروس مستوحى من العلم يغطي المزاج وتقدير الذات والرفاهية العاطفية. يستغرق 10-15 دقيقة. خاص تماماً.',
+    'land.start': 'ابدأ التقييم', 'land.learn': 'اعرف أكثر',
+    'land.privacy': 'لا يتم إرسال إجاباتك إلى أي مكان — جميع البيانات تبقى في متصفحك فقط.',
+    'land.f1t': '30 سؤالاً مدروساً', 'land.f1p': 'أسئلة مصممة بعناية تغطي ثلاثة أبعاد للصحة النفسية، مستوحاة من أطر الفحص المعتمدة.',
+    'land.f2t': 'لوحة نتائج مرئية', 'land.f2p': 'شاهد نتائجك مرسومة بيانياً مع تفصيل الفئات وتفسيرات بلغة واضحة.',
+    'land.f3t': 'توصيات شخصية', 'land.f3p': 'احصل على توصيات رعاية ذاتية مخصصة ومبنية على الأدلة — داعمة وليست وصفية.',
+    'land.disc': 'هذا التقييم ليس تشخيصاً طبياً. النتائج تعليمية ومعلوماتية فقط. إذا كنت تعاني من ضائقة عاطفية شديدة أو مخاوف تتعلق بصحتك النفسية، يرجى طلب الدعم من متخصص في الصحة النفسية.',
+    'land.disc.strong': 'مهم:',
+    'assess.section': 'القسم', 'assess.of': 'من', 'assess.mood': 'المزاج والطاقة',
+    'assess.se': 'تقدير الذات والصورة الذاتية', 'assess.wb': 'الرفاهية العاطفية',
+    'assess.q': 'السؤال', 'assess.prev': 'السابق ←', 'assess.next': '→ التالي', 'assess.finish': '→ عرض النتائج',
+    'assess.crisis': 'لاحظنا شيئاً مهماً. تشير إجابتك إلى أنك قد تعاني من ضائقة كبيرة. يرجى التفكير في التواصل مع شخص موثوق أو متخصص في الصحة النفسية. لست وحدك.',
+    'assess.crisis.strong': 'لاحظنا شيئاً مهماً.',
+    'assess.crisis.support': 'دعم الأزمات:',
+    'opt.0': 'أبداً', 'opt.1': 'نادراً', 'opt.2': 'أحياناً', 'opt.3': 'غالباً', 'opt.4': 'دائماً تقريباً',
+    'res.h1a': 'تقرير', 'res.h1b': 'صحتك النفسية',
+    'res.sub': 'تفصيل شامل لكل درجة ومعناها، مع تحليل شخصي مكتوب بالذكاء الاصطناعي لإجاباتك.',
+    'res.crisis.h': 'يرجى طلب الدعم',
+    'res.crisis.p': 'تشير إجاباتك إلى أنك قد تعاني من ضائقة عاطفية كبيرة. لا يستطيع هذا التقييم تشخيص أي شيء، لكن مشاعرك حقيقية وصالحة — والدعم متاح.',
+    'res.overall': 'درجة الضائقة الإجمالية', 'res.outof': 'من',
+    'res.higher': 'الدرجة الأعلى = مزيد من المخاوف. الدرجة الأقل = مخاوف أقل.',
+    'res.ai.badge': 'تحليل الذكاء الاصطناعي', 'res.ai.powered': 'مدعوم بـ Google Gemini (مجاني) · ليس تشخيصاً طبياً',
+    'res.ai.loading': 'جارٍ تحليل إجاباتك...', 'res.ai.testbtn': 'اختبار API',
+    'res.ai.notested': 'لم يُختبر بعد',
+    'res.patterns.h': 'ما تكشفه إجاباتك',
+    'res.patterns.sub': 'هذه أنماط تم رصدها في إجاباتك — وليست تشخيصات. اعتبرها مجالات تستحق الاهتمام.',
+    'res.score.h': 'درجتك بالتفصيل',
+    'res.score.sub': 'كل قسم يُسجَّل من 0 إلى 40. إليك ما تعنيه أرقامك بلغة واضحة.',
+    'res.qb.h': 'تفصيل سؤال بسؤال',
+    'res.qb.sub': 'شاهد كيف أجبت على كل سؤال وما يعكسه كل رد.',
+    'res.charts.radar': 'رادار الصحة', 'res.charts.bar': 'مستويات القلق',
+    'res.disc': 'هذا التقييم ليس تشخيصاً طبياً. النتائج تعليمية ومعلوماتية فقط. إذا كنت تعاني من ضائقة عاطفية شديدة، يرجى استشارة متخصص في الصحة النفسية.',
+    'res.disc.strong': 'تذكير:',
+    'res.recs.h': 'توصيات شخصية',
+    'res.retake': 'إعادة التقييم', 'res.explore': 'استكشاف الموارد',
+    'res.retry': 'إعادة التحليل',
+    'pat.depression': 'انخفاض المزاج / الاكتئاب', 'pat.selfcrit': 'النقد الذاتي / الخجل',
+    'pat.selfworth': 'انخفاض تقدير الذات', 'pat.lonely': 'الوحدة / الانفصال',
+    'pat.overwhelm': 'الإرهاق العاطفي', 'pat.anxiety': 'القلق / التوتر',
+    'pat.meaning': 'فقدان المعنى / الهدف', 'pat.sleep': 'اضطراب النوم والطاقة',
+    'pat.detected': 'مرصود', 'pat.mild': 'علامات خفيفة', 'pat.none': 'غير مرصود',
+    'pat.source': 'مصدر الإشارة:',
+    'lvl.minimal': 'مخاوف بسيطة', 'lvl.mild': 'مخاوف خفيفة',
+    'lvl.moderate': 'مخاوف متوسطة', 'lvl.significant': 'مخاوف كبيرة',
+    'sm.cat1': 'المزاج والطاقة', 'sm.cat2': 'تقدير الذات', 'sm.cat3': 'الرفاهية العاطفية',
+    'sm.cat1.desc': 'يعكس أنماط المزاج والطاقة والاهتمام والنوم.',
+    'sm.cat2.desc': 'يعكس كيف تنظر إلى نفسك وتقيّم قيمتك الذاتية.',
+    'sm.cat3.desc': 'يعكس قدرتك على إدارة الضغط والتواصل مع الآخرين وإيجاد المعنى.',
+    'sm.no': '(لا مخاوف)', 'sm.max': '(أقصى مخاوف)', 'sm.yourscore': 'درجتك',
+    'sm.yourscore2': ':',
+    'res_page.h': 'الموارد والدعم',
+    'res_page.sub': 'التعليم وأدوات المساعدة الذاتية والتوجيه المهني لدعم رحلتك نحو الصحة النفسية.',
+    'ai.lang': 'arabic',
+  }
+};
+
+function t(key) {
+  return (T[currentLang] && T[currentLang][key]) ? T[currentLang][key] : (T['en'][key] || key);
+}
+
+function setLanguage(lang, shouldPersist = true) {
+  currentLang = lang === 'ar' ? 'ar' : 'en';
+  const isAr = currentLang === 'ar';
+  document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+  document.documentElement.setAttribute('lang', currentLang);
+  document.getElementById('langBtn').textContent = isAr ? 'EN' : 'AR';
+  document.getElementById('langBtnMobile').textContent = isAr ? 'EN' : 'AR';
+  if (shouldPersist) localStorage.setItem('mindcheck_lang', currentLang);
+  applyTranslations();
+}
+
+function toggleLang() {
+  setLanguage(currentLang === 'en' ? 'ar' : 'en');
+}
+
+function applyTranslations() {
+  // Nav
+  document.getElementById('nb-home').textContent = t('nav.home');
+  document.getElementById('nb-assess').textContent = t('nav.assessment');
+  document.getElementById('nb-resources').textContent = t('nav.resources');
+  document.getElementById('mb-home').textContent = t('nav.home');
+  document.getElementById('mb-assess').textContent = t('nav.assessment');
+  document.getElementById('mb-resources').textContent = t('nav.resources');
+
+  // Landing
+  const lTag = document.getElementById('land-tag'); if(lTag) lTag.textContent = t('land.tag');
+  const lH1a = document.getElementById('land-h1a'); if(lH1a) lH1a.textContent = t('land.h1a');
+  const lH1b = document.getElementById('land-h1b'); if(lH1b) lH1b.textContent = t('land.h1b');
+  const lH1c = document.getElementById('land-h1c'); if(lH1c) lH1c.textContent = t('land.h1c');
+  const lSub = document.getElementById('land-sub'); if(lSub) lSub.textContent = t('land.sub');
+  const lStart = document.getElementById('land-start'); if(lStart) lStart.textContent = t('land.start');
+  const lLearn = document.getElementById('land-learn'); if(lLearn) lLearn.textContent = t('land.learn');
+  const lPriv = document.getElementById('land-privacy'); if(lPriv) lPriv.textContent = t('land.privacy');
+  const lF1t = document.getElementById('land-f1t'); if(lF1t) lF1t.textContent = t('land.f1t');
+  const lF1p = document.getElementById('land-f1p'); if(lF1p) lF1p.textContent = t('land.f1p');
+  const lF2t = document.getElementById('land-f2t'); if(lF2t) lF2t.textContent = t('land.f2t');
+  const lF2p = document.getElementById('land-f2p'); if(lF2p) lF2p.textContent = t('land.f2p');
+  const lF3t = document.getElementById('land-f3t'); if(lF3t) lF3t.textContent = t('land.f3t');
+  const lF3p = document.getElementById('land-f3p'); if(lF3p) lF3p.textContent = t('land.f3p');
+  const lDisc = document.getElementById('land-disc-text'); if(lDisc) lDisc.textContent = t('land.disc');
+  const lDiscS = document.getElementById('land-disc-strong'); if(lDiscS) lDiscS.textContent = t('land.disc.strong');
+
+  // Assessment buttons
+  const bPrev = document.getElementById('btnPrev');
+  const bNext = document.getElementById('btnNext');
+  if(bPrev) bPrev.textContent = t('assess.prev');
+  if(bNext && bNext.dataset.islast === 'true') bNext.textContent = t('assess.finish');
+  else if(bNext) bNext.textContent = t('assess.next');
+
+  // Results page static text
+  const rH1a = document.getElementById('res-h1a'); if(rH1a) rH1a.textContent = t('res.h1a');
+  const rH1b = document.getElementById('res-h1b'); if(rH1b) rH1b.textContent = t('res.h1b');
+  const rSub = document.getElementById('res-sub'); if(rSub) rSub.textContent = t('res.sub');
+  const rCH = document.getElementById('res-crisis-h'); if(rCH) rCH.textContent = t('res.crisis.h');
+  const rCP = document.getElementById('res-crisis-p'); if(rCP) rCP.textContent = t('res.crisis.p');
+  const rAiBadge = document.getElementById('res-ai-badge'); if(rAiBadge) rAiBadge.textContent = t('res.ai.badge');
+  const rAiPow = document.getElementById('res-ai-powered'); if(rAiPow) rAiPow.textContent = t('res.ai.powered');
+  const rAiLoad = document.getElementById('res-ai-loadtext'); if(rAiLoad) rAiLoad.textContent = t('res.ai.loading');
+  const rTestBtn = document.getElementById('testApiBtn'); if(rTestBtn) rTestBtn.textContent = t('res.ai.testbtn');
+  const rNotTest = document.getElementById('geminiStatusText');
+  if (rNotTest && (rNotTest.textContent === 'Not tested yet' || rNotTest.textContent === 'لم يُختبر بعد')) rNotTest.textContent = t('res.ai.notested');
+  if (rNotTest && /^Connected · /.test(rNotTest.textContent) && currentLang === 'ar') rNotTest.textContent = rNotTest.textContent.replace('Connected · ', 'متصل · ');
+  if (rNotTest && /^متصل · /.test(rNotTest.textContent) && currentLang === 'en') rNotTest.textContent = rNotTest.textContent.replace('متصل · ', 'Connected · ');
+  const rPatH = document.getElementById('res-patterns-h'); if(rPatH) rPatH.textContent = t('res.patterns.h');
+  const rPatS = document.getElementById('res-patterns-sub'); if(rPatS) rPatS.textContent = t('res.patterns.sub');
+  const rScH = document.getElementById('res-score-h'); if(rScH) rScH.textContent = t('res.score.h');
+  const rScS = document.getElementById('res-score-sub'); if(rScS) rScS.textContent = t('res.score.sub');
+  const rQbH = document.getElementById('res-qb-h'); if(rQbH) rQbH.textContent = t('res.qb.h');
+  const rQbS = document.getElementById('res-qb-sub'); if(rQbS) rQbS.textContent = t('res.qb.sub');
+  const rChR = document.getElementById('res-chart-radar'); if(rChR) rChR.textContent = t('res.charts.radar');
+  const rChB = document.getElementById('res-chart-bar'); if(rChB) rChB.textContent = t('res.charts.bar');
+  const rDiscS = document.getElementById('res-disc-strong'); if(rDiscS) rDiscS.textContent = t('res.disc.strong');
+  const rDiscT = document.getElementById('res-disc-text'); if(rDiscT) rDiscT.textContent = t('res.disc');
+  const rRecsH = document.getElementById('res-recs-h'); if(rRecsH) rRecsH.textContent = t('res.recs.h');
+  const rRetake = document.getElementById('res-retake'); if(rRetake) rRetake.textContent = t('res.retake');
+  const rExplore = document.getElementById('res-explore'); if(rExplore) rExplore.textContent = t('res.explore');
+  document.querySelectorAll('#resultsCrisisBox .crisis-link').forEach(function(link, i) {
+    const arLinks = [
+      '🌍 befrienders.org — خطوط الأزمات الدولية',
+      '📞 988 — خط الانتحار والأزمات في الولايات المتحدة',
+      '📞 116 123 — ساماريتانز (المملكة المتحدة)',
+      '📞 182 — خط الدعم النفسي في تركيا'
+    ];
+    const enLinks = [
+      '🌍 befrienders.org — International crisis lines',
+      '📞 988 — US Suicide & Crisis Lifeline',
+      '📞 116 123 — Samaritans (UK)',
+      '📞 182 — Turkey Psychological Support Line'
+    ];
+    link.textContent = currentLang === 'ar' ? arLinks[i] : enLinks[i];
+  });
+
+  // Resources page
+  const rpH = document.getElementById('res-page-h'); if(rpH) rpH.textContent = t('res_page.h');
+  const rpS = document.getElementById('res-page-sub'); if(rpS) rpS.textContent = t('res_page.sub');
+  applyHardcodedTranslations();
+  const acS = document.getElementById('assess-crisis-strong'); if(acS) acS.textContent = t('assess.crisis.strong');
+  const acT = document.getElementById('assess-crisis-text'); if(acT) acT.textContent = t('assess.crisis');
+  const acSup = document.getElementById('assess-crisis-support'); if(acSup) acSup.textContent = t('assess.crisis.support');
+
+  // Re-render dynamic content if results are showing
+  if (document.getElementById('page-results').classList.contains('active')) {
+    const heroEl = document.getElementById('scoreHero');
+    const sd = heroEl ? heroEl.dataset : {};
+    if (sd.total) {
+      function getLevelForLang(pct) {
+        if (pct <= 25) return { label: t('lvl.minimal'), color: '#7C9A7E' };
+        if (pct <= 50) return { label: t('lvl.mild'), color: '#C4916A' };
+        if (pct <= 75) return { label: t('lvl.moderate'), color: '#B07070' };
+        return { label: t('lvl.significant'), color: '#933333' };
+      }
+      const scoresForLang = {depression:parseInt(sd.dep)||0, selfesteem:parseInt(sd.se)||0, wellbeing:parseInt(sd.wb)||0};
+      const maxesForLang = {depression:parseInt(sd.mdep)||40, selfesteem:parseInt(sd.mse)||40, wellbeing:parseInt(sd.mwb)||40};
+      const pctsForLang = {depression:parseInt(sd.pdep)||0, selfesteem:parseInt(sd.pse)||0, wellbeing:parseInt(sd.pwb)||0};
+      const totalScoreForLang = parseInt(sd.total)||0;
+      const totalMaxForLang = parseInt(sd.tmax)||120;
+      const totalPctForLang = totalMaxForLang > 0 ? Math.round((totalScoreForLang / totalMaxForLang) * 100) : 0;
+      const hasCrisisForLang = document.getElementById('resultsCrisisBox').style.display !== 'none';
+      renderResults({
+        scores: scoresForLang,
+        maxes: maxesForLang,
+        pcts: pctsForLang,
+        totalPct: totalPctForLang,
+        totalScore: totalScoreForLang,
+        totalMax: totalMaxForLang,
+        hasCrisis: hasCrisisForLang,
+        getLevel: getLevelForLang
+      });
+    }
+  }
+  // Re-render assessment question if showing
+  if (document.getElementById('page-assess').classList.contains('active')) {
+    renderQuestion();
+  }
+}
+
+function applyHardcodedTranslations() {
+  const isAr = currentLang === 'ar';
+  const heroCards = [
+    ['Depression screening', 'فحص مؤشرات الاكتئاب'],
+    ['Mood & energy patterns', 'أنماط المزاج والطاقة'],
+    ['Based on established PHQ-inspired concepts', 'مستند إلى مفاهيم مستوحاة من PHQ'],
+    ['Self-esteem', 'تقدير الذات'],
+    ['Self-image & confidence', 'الصورة الذاتية والثقة'],
+    ['Rosenberg-inspired framework', 'إطار مستوحى من مقياس روزنبرغ'],
+    ['Emotional well-being', 'الرفاهية العاطفية'],
+    ['Stress & resilience', 'الضغط والمرونة'],
+    ['Coping patterns and emotional balance', 'أنماط التكيف والتوازن العاطفي']
+  ];
+  document.querySelectorAll('.hero-card-label, .hero-card-title, .hero-card-sub').forEach(function(el, i) {
+    if (heroCards[i]) el.textContent = isAr ? heroCards[i][1] : heroCards[i][0];
+  });
+
+  const resourceSections = document.querySelectorAll('#page-resources .resources-section');
+  const sectionTitles = isAr
+    ? ['فهم الصحة النفسية', 'ممارسات المساعدة الذاتية', 'متى تطلب مساعدة متخصصة', 'خطوط دعم الأزمات']
+    : ['Understanding mental wellness', 'Self-help practices', 'When to seek professional help', 'Crisis support lines'];
+  resourceSections.forEach(function(section, i) {
+    const h2 = section.querySelector('h2');
+    if (h2 && sectionTitles[i]) h2.textContent = sectionTitles[i];
+  });
+
+  const resourceCards = [
+    ['Mood', 'What is depression?', 'Depression is more than sadness. It\'s a persistent low mood affecting energy, thinking, and daily functioning. It\'s common and treatable.',
+     'المزاج', 'ما هو الاكتئاب؟', 'الاكتئاب أكثر من مجرد حزن. إنه انخفاض مستمر في المزاج يؤثر في الطاقة والتفكير والأداء اليومي، وهو شائع وقابل للعلاج.'],
+    ['Self-esteem', 'Building self-worth', 'Self-esteem is how you evaluate yourself. Low self-esteem can be improved through consistent practice and sometimes professional support.',
+     'تقدير الذات', 'بناء القيمة الذاتية', 'تقدير الذات هو الطريقة التي تقيّم بها نفسك. يمكن تحسين انخفاض تقدير الذات بالممارسة المستمرة وأحياناً بالدعم المتخصص.'],
+    ['Wellness', 'Emotional resilience', 'Resilience is the ability to adapt in the face of adversity. It can be built — it\'s not a fixed trait you either have or don\'t.',
+     'الرفاهية', 'المرونة العاطفية', 'المرونة هي القدرة على التكيف مع الشدائد. يمكن بناؤها، فهي ليست صفة ثابتة تملكها أو لا تملكها.'],
+    ['Stress', 'Understanding anxiety', 'Anxiety is a normal response to stress, but when persistent, it can interfere with life. Effective evidence-based treatments exist.',
+     'الضغط', 'فهم القلق', 'القلق استجابة طبيعية للضغط، لكنه عندما يستمر قد يتداخل مع الحياة. توجد علاجات فعالة مبنية على الأدلة.'],
+    ['Mindfulness', '5-4-3-2-1 grounding', 'Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. Helps interrupt anxious thoughts in the moment.',
+     'اليقظة', 'تمرين التأريض 5-4-3-2-1', 'سمِّ 5 أشياء تراها، و4 تلمسها، و3 تسمعها، و2 تشمها، و1 تتذوقها. يساعد هذا على إيقاف الأفكار القلقة في اللحظة.'],
+    ['Breathing', 'Box breathing', 'Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat 4 times. Activates the parasympathetic nervous system to reduce stress quickly.',
+     'التنفس', 'تنفس الصندوق', 'خذ شهيقاً 4 عدات، احبس النفس 4، ازفر 4، ثم توقف 4. كرر ذلك 4 مرات لتقليل التوتر بسرعة.'],
+    ['Journaling', 'Expressive writing', 'Writing about thoughts and feelings for 15–20 minutes has strong evidence for improving mood and processing difficult emotions.',
+     'التدوين', 'الكتابة التعبيرية', 'الكتابة عن الأفكار والمشاعر لمدة 15-20 دقيقة لها دليل قوي في تحسين المزاج ومعالجة المشاعر الصعبة.'],
+    ['Movement', 'Exercise & mood', 'Even 20–30 minutes of moderate aerobic exercise 3x per week has significant evidence for improving mood and reducing anxiety.',
+     'الحركة', 'الرياضة والمزاج', 'حتى 20-30 دقيقة من التمارين الهوائية المعتدلة 3 مرات أسبوعياً قد تساعد كثيراً في تحسين المزاج وتقليل القلق.'],
+    ['International', 'Befrienders Worldwide', 'befrienders.org — find crisis lines in your country. Available in dozens of countries worldwide.',
+     'دولي', 'Befrienders Worldwide', 'befrienders.org — ابحث عن خطوط دعم الأزمات في بلدك. متاح في عشرات البلدان حول العالم.'],
+    ['USA', '988 Suicide & Crisis Lifeline', 'Call or text 988. Available 24/7. Free, confidential crisis counseling for people in distress.',
+     'الولايات المتحدة', '988 Suicide & Crisis Lifeline', 'اتصل أو أرسل رسالة إلى 988. متاح 24/7، مجاني وسري للأشخاص في ضائقة.'],
+    ['UK', 'Samaritans', 'Call 116 123, free 24/7. For anyone struggling to cope or at risk of suicide. Also available via email.',
+     'المملكة المتحدة', 'Samaritans', 'اتصل على 116 123 مجاناً 24/7. لمن يواجه صعوبة في التكيف أو خطر الانتحار، ومتاح أيضاً عبر البريد الإلكتروني.'],
+    ['Turkey', 'ALO 182', 'Turkey\'s Psychological Support Line — free, 24/7, confidential support in Turkish.',
+     'تركيا', 'ALO 182', 'خط الدعم النفسي في تركيا — دعم مجاني وسري على مدار الساعة باللغة التركية.']
+  ];
+  document.querySelectorAll('#page-resources .resource-card').forEach(function(card, i) {
+    const data = resourceCards[i];
+    if (!data) return;
+    const offset = isAr ? 3 : 0;
+    const tag = card.querySelector('.resource-card-tag');
+    const h4 = card.querySelector('h4');
+    const p = card.querySelector('p');
+    if (tag) tag.textContent = data[offset];
+    if (h4) h4.textContent = data[offset + 1];
+    if (p) p.textContent = data[offset + 2];
+  });
+
+  const seekTitle = document.querySelector('#page-resources .when-to-seek h3');
+  if (seekTitle) seekTitle.textContent = isAr ? 'فكر في التواصل مع متخصص إذا كنت تعاني من:' : 'Consider reaching out to a professional if you experience:';
+  const seekItems = isAr
+    ? ['مزاج منخفض مستمر لأكثر من أسبوعين', 'أفكار بإيذاء نفسك أو الآخرين', 'تغيرات كبيرة في النوم أو الشهية أو الوزن', 'صعوبة في الأداء في العمل أو الدراسة أو العلاقات', 'الشعور باليأس أو أن الحياة لا تستحق العيش', 'استخدام مواد للتعامل مع الألم العاطفي', 'قلق يبدو خارج السيطرة أو مرهقاً', 'الشعور بالانفصال عن نفسك أو الواقع']
+    : ['Persistent low mood lasting more than two weeks', 'Thoughts of harming yourself or others', 'Significant changes in sleep, appetite, or weight', 'Difficulty functioning at work, school, or in relationships', 'Feeling hopeless or that life is not worth living', 'Using substances to cope with emotional pain', 'Anxiety that feels uncontrollable or overwhelming', 'Feeling disconnected from yourself or reality'];
+  document.querySelectorAll('#page-resources .when-to-seek li').forEach(function(li, i) {
+    if (seekItems[i]) li.textContent = seekItems[i];
+  });
+}
+
+// Mobile menu
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const overlay = document.getElementById('mobileOverlay');
+  const burger = document.getElementById('hamburger');
+  const isOpen = menu.classList.contains('open');
+  menu.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+  burger.classList.toggle('open', !isOpen);
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+setLanguage(localStorage.getItem('mindcheck_lang') || 'en', false);
+showPage('landing');
+</script>
+</body>
+</html>
