@@ -1,0 +1,7 @@
+# Secret files — NEVER commit these
+.env
+config.js
+
+# Node
+node_modules/
+npm-debug.log*
