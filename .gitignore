@@ -1,0 +1,12 @@
+# Local env file (contains real API key — never commit)
+.env
+
+# Local config.js (generated from .env — never commit)
+config.js
+
+# Build output
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
